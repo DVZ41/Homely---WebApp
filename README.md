@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🏠 HOMELY - Documentación Técnica
 
 > **Aplicación de gestión de tareas domésticas con gamificación**  
@@ -669,3 +670,6 @@ import { getCategoryColor, getCategoryEmoji } from '@/lib/categoryUtils';
 
 > **Mantenido por**: Equipo de desarrollo Homely  
 > **Última actualización**: Enero 2025
+
+# Homely---WebApp
+Repositorio con los archivos de la web de Homely
