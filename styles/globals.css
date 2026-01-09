@@ -1,0 +1,672 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * HOMELY - ESTILOS GLOBALES
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * Este archivo define:
+ * 1. Variables CSS para colores (light/dark mode)
+ * 2. Tipografía base
+ * 3. Sistema de hover personalizado
+ * 
+ * PALETA DE COLORES HOMELY:
+ * - Primary Green:  #28AC71 (acciones, botones, enlaces)
+ * - Accent Coral:   #E76F51 (destacados, urgencias)
+ * - Secondary Gray: #605669 (texto secundario, sutiles)
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   IMPORTACIONES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Fuentes de Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&family=Lora:wght@400;500;600;700&display=swap");
+
+/* Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* Variant personalizado para modo oscuro */
+@custom-variant dark (&:is(.dark *));
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VARIABLES CSS - MODO CLARO
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --font-size: 16px;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORES BASE - Light Mode
+     ───────────────────────────────────────────────────────────────────────── */
+  --background: #f5f5f7;           /* Fondo principal de la app */
+  --foreground: #322b38;           /* Texto principal oscuro */
+  
+  --card: #ffffff;                 /* Fondo de tarjetas/cards */
+  --card-foreground: #322b38;      /* Texto dentro de cards */
+  
+  --popover: #ffffff;              /* Fondo de menús emergentes */
+  --popover-foreground: #322b38;   /* Texto en popovers */
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORES PRINCIPALES
+     ───────────────────────────────────────────────────────────────────────── */
+  --primary: #28ac71;              /* Verde Homely - Botones principales */
+  --primary-light: #3dd98c;        /* Verde claro - Estados activos */
+  --primary-hover: #229960;        /* Verde medio - Hover primario */
+  --primary-dark: #1a7a4a;         /* Verde oscuro - Énfasis */
+  --primary-foreground: #ffffff;   /* Texto sobre botones verdes */
+
+  --secondary: #605669;            /* Gris - Elementos secundarios */
+  --secondary-foreground: #ffffff; /* Texto sobre gris */
+
+  --accent: #e76f51;               /* Coral - Destacados/Urgentes */
+  --accent-light: #ff8b6f;         /* Coral claro - Estados activos */
+  --accent-hover: #d95840;         /* Coral oscuro - Hover accent */
+  --accent-dark: #c24332;          /* Coral muy oscuro - Énfasis */
+  --accent-foreground: #ffffff;    /* Texto sobre coral */
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORES DE CATEGORÍAS DE TAREAS
+     ───────────────────────────────────────────────────────────────────────── */
+  --category-kitchen: #F97316;     /* 🍳 Cocina - Naranja cálido */
+  --category-kitchen-light: #FDBA74;
+  --category-kitchen-dark: #C2410C;
+
+  --category-cleaning: #FBBF24;    /* 🧹 Limpieza - Amarillo */
+  --category-cleaning-light: #FDE047;
+  --category-cleaning-dark: #CA8A04;
+
+  --category-bathroom: #06B6D4;    /* 🚿 Baño - Cyan fresco */
+  --category-bathroom-light: #67E8F9;
+  --category-bathroom-dark: #0891B2;
+
+  --category-laundry: #2563EB;     /* 👕 Lavandería - Azul royal */
+  --category-laundry-light: #60A5FA;
+  --category-laundry-dark: #1E3A8A;
+
+  --category-shopping: #EC4899;    /* 🛒 Compras - Magenta */
+  --category-shopping-light: #F9A8D4;
+  --category-shopping-dark: #BE185D;
+
+  --category-garden: #22C55E;      /* 🌱 Jardín - Verde vivo */
+  --category-garden-light: #86EFAC;
+  --category-garden-dark: #15803D;
+
+  --category-pets: #A16207;        /* 🐾 Mascotas - Marrón dorado */
+  --category-pets-light: #D97706;
+  --category-pets-dark: #78350F;
+
+  --category-general: #64748B;     /* 📋 General - Gris neutro */
+  --category-general-light: #94A3B8;
+  --category-general-dark: #475569;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORES DE GAMIFICACIÓN
+     ───────────────────────────────────────────────────────────────────────── */
+  --rarity-common: #9CA3AF;        /* ⚪ Común - Gris */
+  --rarity-common-light: #D1D5DB;
+  --rarity-rare: #2824ff;          /* 🔵 Raro - Azul */
+  --rarity-rare-light: #93C5FD;
+  --rarity-epic: #9d40f3;          /* 💜 Épico - Púrpura */
+  --rarity-epic-light: #D8B4FE;
+  --rarity-legendary: #F59E0B;     /* 🟡 Legendario - Dorado */
+  --rarity-legendary-light: #FCD34D;
+
+  --podium-gold: #FFD700;          /* 🥇 Oro */
+  --podium-gold-light: #FEF08A;
+  --podium-silver: #C0C0C0;        /* 🥈 Plata */
+  --podium-silver-light: #E5E7EB;
+  --podium-bronze: #CD7F32;        /* 🥉 Bronce */
+  --podium-bronze-light: #D2A679;
+
+  --xp: #f033e0;                   /* 💜 Experiencia */
+  --xp-light: #ff77d6;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORES SEMÁNTICOS
+     ───────────────────────────────────────────────────────────────────────── */
+  --success: #22C55E;              /* ✅ Éxito */
+  --success-light: #86EFAC;
+  --success-dark: #15803D;
+  --success-foreground: #ffffff;
+
+  --warning: #F59E0B;              /* ⚠️ Advertencia */
+  --warning-light: #FCD34D;
+  --warning-dark: #B45309;
+  --warning-foreground: #000000;
+
+  --info: #0EA5E9;                 /* ℹ️ Información */
+  --info-light: #7DD3FC;
+  --info-dark: #0369A1;
+  --info-foreground: #ffffff;
+
+  --danger: #EF4444;               /* 🚨 Peligro */
+  --danger-light: #FCA5A5;
+  --danger-dark: #B91C1C;
+  --danger-foreground: #ffffff;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     ESTADOS Y UTILIDADES
+     ───────────────────────────────────────────────────────────────────────── */
+  --muted: #f5f5f5;                /* Fondos apagados/deshabilitados */
+  --muted-foreground: #605669;     /* Texto deshabilitado */
+
+  --destructive: #e76f51;          /* Errores, eliminar (usa accent) */
+  --destructive-foreground: #ffffff;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     BORDES Y FORMULARIOS
+     ───────────────────────────────────────────────────────────────────────── */
+  --border: rgba(50, 43, 56, 0.1); /* Bordes sutiles */
+  --input: transparent;            /* Fondo input (usa background) */
+  --input-background: #ffffff;     /* Fondo específico para inputs */
+  --ring: #28ac71;                 /* Anillo de focus (verde) */
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     GRÁFICOS (Recharts)
+     ───────────────────────────────────────────────────────────────────────── */
+  --chart-1: #28ac71;              /* Verde primary */
+  --chart-2: #29541f;              /* Verde oscuro */
+  --chart-3: #e76f51;              /* Coral accent */
+  --chart-4: #605669;              /* Gris secondary */
+  --chart-5: #322b38;              /* Texto oscuro */
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     SIDEBAR (Menú lateral)
+     ───────────────────────────────────────────────────────────────────────── */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #322b38;
+  --sidebar-primary: #28ac71;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fffff2;       /* Hover suave */
+  --sidebar-accent-foreground: #322b38;
+  --sidebar-border: rgba(50, 43, 56, 0.1);
+  --sidebar-ring: #28ac71;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     OTROS
+     ───────────────────────────────────────────────────────────────────────── */
+  --radius: 0.75rem;               /* 12px - Border radius base */
+  --switch-background: #cbced4;    /* Fondo de switches/toggles */
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VARIABLES CSS - MODO OSCURO
+   ═══════════════════════════════════════════════════════════════════════════ */
+.dark {
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORES BASE - Dark Mode
+     ───────────────────────────────────────────────────────────────────────── */
+  --background: #181a18;           /* Fondo oscuro */
+  --foreground: #f1f1eb;           /* Texto claro */
+  
+  --card: #262a24;                 /* Fondo de tarjetas oscuras */
+  --card-foreground: #f1f1eb;      /* Texto en cards */
+  
+  --popover: #262a24;
+  --popover-foreground: #f1f1eb;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORES PRINCIPALES (se mantienen)
+     ───────────────────────────────────────────────────────────────────────── */
+  --primary: #28ac71;              /* Verde se mantiene */
+  --primary-light: #3dd98c;        /* Verde claro */
+  --primary-hover: #229960;        /* Verde medio */
+  --primary-dark: #1a7a4a;         /* Verde oscuro */
+  --primary-foreground: #ffffff;
+
+  --secondary: #d8d8d0;            /* Gris claro en dark mode */
+  --secondary-foreground: #181a18; /* Texto oscuro sobre gris claro */
+
+  --accent: #e76f51;               /* Coral se mantiene */
+  --accent-light: #ff8b6f;         /* Coral claro */
+  --accent-hover: #d95840;         /* Coral oscuro */
+  --accent-dark: #c24332;          /* Coral muy oscuro */
+  --accent-foreground: #ffffff;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORES DE CATEGORÍAS (se mantienen igual en dark mode)
+     ───────────────────────────────────────────────────────────────────────── */
+  --category-kitchen: #F97316;
+  --category-kitchen-light: #FDBA74;
+  --category-kitchen-dark: #C2410C;
+  --category-cleaning: #FBBF24;
+  --category-cleaning-light: #FDE047;
+  --category-cleaning-dark: #CA8A04;
+  --category-bathroom: #06B6D4;
+  --category-bathroom-light: #67E8F9;
+  --category-bathroom-dark: #0891B2;
+  --category-laundry: #2563EB;
+  --category-laundry-light: #60A5FA;
+  --category-laundry-dark: #1E3A8A;
+  --category-shopping: #EC4899;
+  --category-shopping-light: #F9A8D4;
+  --category-shopping-dark: #BE185D;
+  --category-garden: #22C55E;
+  --category-garden-light: #86EFAC;
+  --category-garden-dark: #15803D;
+  --category-pets: #A16207;
+  --category-pets-light: #D97706;
+  --category-pets-dark: #78350F;
+  --category-general: #64748B;
+  --category-general-light: #94A3B8;
+  --category-general-dark: #475569;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORES DE GAMIFICACIÓN (se mantienen igual en dark mode)
+     ───────────────────────────────────────────────────────────────────────── */
+  --rarity-common: #9CA3AF;
+  --rarity-common-light: #D1D5DB;
+  --rarity-rare: #3B82F6;
+  --rarity-rare-light: #93C5FD;
+  --rarity-epic: #A855F7;
+  --rarity-epic-light: #D8B4FE;
+  --rarity-legendary: #F59E0B;
+  --rarity-legendary-light: #FCD34D;
+  --podium-gold: #FFD700;
+  --podium-gold-light: #FEF08A;
+  --podium-silver: #C0C0C0;
+  --podium-silver-light: #E5E7EB;
+  --podium-bronze: #CD7F32;
+  --podium-bronze-light: #D2A679;
+  --xp: #A855F7;
+  --xp-light: #C084FC;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORES SEMÁNTICOS (se mantienen igual en dark mode)
+     ───────────────────────────────────────────────────────────────────────── */
+  --success: #22C55E;
+  --success-light: #86EFAC;
+  --success-dark: #15803D;
+  --success-foreground: #ffffff;
+  --warning: #F59E0B;
+  --warning-light: #FCD34D;
+  --warning-dark: #B45309;
+  --warning-foreground: #000000;
+  --info: #0EA5E9;
+  --info-light: #7DD3FC;
+  --info-dark: #0369A1;
+  --info-foreground: #ffffff;
+  --danger: #EF4444;
+  --danger-light: #FCA5A5;
+  --danger-dark: #B91C1C;
+  --danger-foreground: #ffffff;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     ESTADOS Y UTILIDADES
+     ───────────────────────────────────────────────────────────────────────── */
+  --muted: #2e352c;                /* Fondos apagados oscuros */
+  --muted-foreground: #d8d8d0;     /* Texto deshabilitado claro */
+
+  --destructive: #e76f51;
+  --destructive-foreground: #ffffff;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     BORDES Y FORMULARIOS
+     ───────────────────────────────────────────────────────────────────────── */
+  --border: rgba(241, 241, 235, 0.15); /* Bordes claros con transparencia */
+  --input: rgba(241, 241, 235, 0.1);
+  --input-background: #2e352c;
+  --ring: #28ac71;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     GRÁFICOS (Recharts) - Dark Mode
+     ───────────────────────────────────────────────────────────────────────── */
+  --chart-1: #28ac71;
+  --chart-2: #29541f;
+  --chart-3: #e76f51;
+  --chart-4: #d8d8d0;              /* Gris claro */
+  --chart-5: #f1f1eb;              /* Texto claro */
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     SIDEBAR
+     ───────────────────────────────────────────────────────────────────────── */
+  --sidebar: #262a24;
+  --sidebar-foreground: #f1f1eb;
+  --sidebar-primary: #28ac71;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2e352c;
+  --sidebar-accent-foreground: #f1f1eb;
+  --sidebar-border: rgba(241, 241, 235, 0.1);
+  --sidebar-ring: #28ac71;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAPEO DE VARIABLES PARA TAILWIND V4
+   ═══════════════════════════════════════════════════════════════════════════
+   Esto conecta las variables CSS con las clases de Tailwind
+   ═══════════════════════════════════════════════════════════════════════════ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Categorías */
+  --color-category-kitchen: var(--category-kitchen);
+  --color-category-kitchen-light: var(--category-kitchen-light);
+  --color-category-kitchen-dark: var(--category-kitchen-dark);
+  --color-category-cleaning: var(--category-cleaning);
+  --color-category-cleaning-light: var(--category-cleaning-light);
+  --color-category-cleaning-dark: var(--category-cleaning-dark);
+  --color-category-bathroom: var(--category-bathroom);
+  --color-category-bathroom-light: var(--category-bathroom-light);
+  --color-category-bathroom-dark: var(--category-bathroom-dark);
+  --color-category-laundry: var(--category-laundry);
+  --color-category-laundry-light: var(--category-laundry-light);
+  --color-category-laundry-dark: var(--category-laundry-dark);
+  --color-category-shopping: var(--category-shopping);
+  --color-category-shopping-light: var(--category-shopping-light);
+  --color-category-shopping-dark: var(--category-shopping-dark);
+  --color-category-garden: var(--category-garden);
+  --color-category-garden-light: var(--category-garden-light);
+  --color-category-garden-dark: var(--category-garden-dark);
+  --color-category-pets: var(--category-pets);
+  --color-category-pets-light: var(--category-pets-light);
+  --color-category-pets-dark: var(--category-pets-dark);
+  --color-category-general: var(--category-general);
+  --color-category-general-light: var(--category-general-light);
+  --color-category-general-dark: var(--category-general-dark);
+
+  /* Rarezas */
+  --color-rarity-common: var(--rarity-common);
+  --color-rarity-common-light: var(--rarity-common-light);
+  --color-rarity-rare: var(--rarity-rare);
+  --color-rarity-rare-light: var(--rarity-rare-light);
+  --color-rarity-epic: var(--rarity-epic);
+  --color-rarity-epic-light: var(--rarity-epic-light);
+  --color-rarity-legendary: var(--rarity-legendary);
+  --color-rarity-legendary-light: var(--rarity-legendary-light);
+
+  /* Podio */
+  --color-podium-gold: var(--podium-gold);
+  --color-podium-gold-light: var(--podium-gold-light);
+  --color-podium-silver: var(--podium-silver);
+  --color-podium-silver-light: var(--podium-silver-light);
+  --color-podium-bronze: var(--podium-bronze);
+  --color-podium-bronze-light: var(--podium-bronze-light);
+
+  /* XP */
+  --color-xp: var(--xp);
+  --color-xp-light: var(--xp-light);
+
+  /* Semánticos */
+  --color-success: var(--success);
+  --color-success-light: var(--success-light);
+  --color-success-dark: var(--success-dark);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-light: var(--warning-light);
+  --color-warning-dark: var(--warning-dark);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-light: var(--info-light);
+  --color-info-dark: var(--info-dark);
+  --color-info-foreground: var(--info-foreground);
+  --color-danger: var(--danger);
+  --color-danger-light: var(--danger-light);
+  --color-danger-dark: var(--danger-dark);
+  --color-danger-foreground: var(--danger-foreground);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ESTILOS BASE
+   ═══════════════════════════════════════════════════════════════════════════ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Work Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;    /* Mejor renderizado en macOS */
+    -moz-osx-font-smoothing: grayscale;     /* Mejor renderizado en Firefox/macOS */
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TIPOGRAFÍA
+   ═══════════════════════════════════════════════════════════════════════════
+   Sistema de tipografía usando Work Sans (cuerpo) y Lora (títulos)
+   ═══════════════════════════════════════════════════════════════════════════ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    /* Títulos grandes - Lora (Serif) */
+    h1, h2, h3 {
+      font-family: "Lora", serif;
+    }
+
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    /* Títulos pequeños - Work Sans */
+    h4 {
+      font-family: "Work Sans", sans-serif;
+      font-size: var(--text-base);
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    /* Formularios y controles - Work Sans */
+    label, button {
+      font-family: "Work Sans", sans-serif;
+      font-size: var(--text-base);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    input, textarea, select {
+      font-family: "Work Sans", sans-serif;
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+
+    /* Párrafos - Work Sans */
+    p {
+      font-family: "Work Sans", sans-serif;
+      line-height: 1.6;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SISTEMA DE HOVER - HOMELY DESIGN SYSTEM
+   ═══════════════════════════════════════════════════════════════════════════
+   Clases reutilizables para efectos hover consistentes en toda la app
+   Uso: añade la clase correspondiente a tus elementos
+   ═══════════════════════════════════════════════════════════════════════════ */
+@layer components {
+  /* ─────────────────────────────────────────────────────────────────────────
+     NAVEGACIÓN
+     ───────────────────────────────────────────────────────────────────────── */
+  /* Items del menú lateral */
+  .hover-nav {
+    @apply transition-all duration-200 
+           hover:bg-primary/10 hover:text-foreground hover:scale-[1.02];
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     BOTONES
+     ───────────────────────────────────────────────────────────────────────── */
+  /* Botones principales (verde) */
+  .hover-button-primary {
+    @apply transition-all duration-200 
+           hover:bg-primary-hover hover:shadow-lg hover:scale-[1.02] 
+           active:scale-[0.98];
+  }
+
+  /* Botones secundarios (gris) */
+  .hover-button-secondary {
+    @apply transition-all duration-200 
+           hover:bg-secondary/10 hover:text-secondary hover:shadow-md hover:scale-[1.02] 
+           active:scale-[0.98];
+  }
+
+  /* Botones destructivos (rojo/coral) */
+  .hover-destructive {
+    @apply transition-all duration-200 
+           hover:bg-destructive/10 hover:text-destructive hover:scale-[1.02] 
+           active:scale-[0.98];
+  }
+
+  /* Botones con icono solamente */
+  .hover-icon-button {
+    @apply transition-all duration-200 
+           hover:bg-primary/10 hover:text-primary hover:scale-110 
+           active:scale-95;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     TARJETAS
+     ───────────────────────────────────────────────────────────────────────── */
+  /* Tarjetas informativas (no clickeables) */
+  .hover-card {
+    @apply transition-all duration-300 
+           hover:shadow-xl hover:scale-[1.02] hover:border-primary/20;
+  }
+
+  /* Tarjetas clickeables/interactivas */
+  .hover-card-interactive {
+    @apply transition-all duration-300 
+           hover:shadow-xl hover:scale-[1.03] hover:border-primary/30 
+           active:scale-[1.01] cursor-pointer;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     LISTAS Y LINKS
+     ───────────────────────────────────────────────────────────────────────── */
+  /* Items de listas */
+  .hover-list-item {
+    @apply transition-all duration-200 
+           hover:bg-muted/50 hover:pl-2 hover:border-l-4 hover:border-primary;
+  }
+
+  /* Enlaces de texto */
+  .hover-link {
+    @apply transition-all duration-150 
+           hover:text-primary hover:underline hover:underline-offset-4;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     OTROS ELEMENTOS
+     ───────────────────────────────────────────────────────────────────────── */
+  /* Badges/Tags */
+  .hover-badge {
+    @apply transition-all duration-200 
+           hover:shadow-md hover:scale-105;
+  }
+
+  /* Focus state para inputs */
+  .focus-input {
+    @apply focus:ring-2 focus:ring-primary/30 focus:border-primary 
+           transition-all duration-200;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCROLLBAR PERSONALIZADO
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Scrollbar para navegadores Webkit (Chrome, Safari, Edge) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--muted);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-hover);
+}
+
+/* Scrollbar más delgado para elementos específicos */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* Modo oscuro */
+.dark *::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark *::-webkit-scrollbar-thumb {
+  background: var(--primary);
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-hover);
+}
