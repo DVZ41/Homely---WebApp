@@ -469,10 +469,7 @@ export function TaskList({
       }
     }
 
-    console.log(`Creating routine: ${routine.name} with ${routine.tasks.length} tasks`);
-    
-    routine.tasks.forEach((task, index) => {
-      console.log(`Creating task ${index + 1}/${routine.tasks.length}: ${task.title}`);
+    routine.tasks.forEach((task) => {
       onAddTask({
         title: task.title,
         description: task.description,
@@ -488,7 +485,6 @@ export function TaskList({
       });
     });
 
-    console.log(`Routine ${routine.name} creation completed`);
     setShowRoutines(false);
   };
 
@@ -699,8 +695,9 @@ export function TaskList({
           <button
             onClick={() => setIsAddingTask(true)}
             className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover hover:scale-105 hover:shadow-lg transition-all duration-200 shadow-md"
+            aria-label="Nueva Tarea"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4" aria-hidden="true" />
             Nueva Tarea
           </button>
         </div>
@@ -947,6 +944,7 @@ export function TaskList({
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as any)}
               aria-label="Filtrar por estado"
+              title="Filtrar por estado"
               className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">Todas</option>
@@ -963,6 +961,7 @@ export function TaskList({
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
               aria-label="Filtrar por categoría"
+              title="Filtrar por categoría"
               className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">Todas</option>
@@ -978,6 +977,7 @@ export function TaskList({
               value={filterMember}
               onChange={(e) => setFilterMember(e.target.value)}
               aria-label="Filtrar por miembro"
+              title="Filtrar por miembro"
               className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">Todos</option>
@@ -998,6 +998,7 @@ export function TaskList({
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
               aria-label="Ordenar tareas"
+              title="Ordenar tareas"
               className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="date">Fecha</option>
@@ -1245,9 +1246,10 @@ export function TaskList({
                 ? 'bg-primary/10 text-primary'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
+            aria-label="Vista Kanban"
             title="Vista Kanban"
           >
-            <Columns3 className="w-4 h-4" />
+            <Columns3 className="w-4 h-4" aria-hidden="true" />
           </button>
           <button
             onClick={() => setViewMode('list')}
@@ -1256,9 +1258,10 @@ export function TaskList({
                 ? 'bg-primary/10 text-primary'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
+            aria-label="Vista de lista"
             title="Vista de lista"
           >
-            <List className="w-4 h-4" />
+            <List className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </div>

@@ -1,0 +1,8 @@
+# Ignore files
+node_modules/
+dist/
+build/
+.next/
+
+# Markdown files (preserve formatting)
+*.md

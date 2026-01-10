@@ -1,5 +1,5 @@
 import { Member, Task, Reward } from '../App';
-import { Trophy, TrendingUp, CheckCircle, Calendar, Award as AwardIcon, Target, Flame, Star } from 'lucide-react';
+import { TrendingUp, CheckCircle, Calendar, Target, Flame, Star } from 'lucide-react';
 
 type ProfileProps = {
   currentUser: Member | undefined;

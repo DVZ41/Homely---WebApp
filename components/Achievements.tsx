@@ -285,6 +285,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {/* Común */}
           <button
+            type="button"
             onClick={() => handleRarityClick('common')}
             className="flex flex-col items-center text-center p-2 rounded-lg hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer"
             style={{ backgroundColor: 'rgba(156, 163, 175, 0.1)' }}
@@ -299,6 +300,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
 
           {/* Raro */}
           <button
+            type="button"
             onClick={() => handleRarityClick('rare')}
             className="flex flex-col items-center text-center p-2 rounded-lg hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer"
             style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}
@@ -313,6 +315,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
 
           {/* Épico */}
           <button
+            type="button"
             onClick={() => handleRarityClick('epic')}
             className="flex flex-col items-center text-center p-2 rounded-lg hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer"
             style={{ backgroundColor: 'rgba(168, 85, 247, 0.1)' }}
@@ -327,6 +330,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
 
           {/* Legendario */}
           <button
+            type="button"
             onClick={() => handleRarityClick('legendary')}
             className="flex flex-col items-center text-center p-2 rounded-lg hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer"
             style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)' }}
@@ -496,6 +500,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
             </h3>
             <div className="flex flex-wrap items-center gap-1.5">
               <button
+                type="button"
                 onClick={() => setUnlockedFilter('all')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   unlockedFilter === 'all' 
@@ -506,6 +511,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
                 Todos
               </button>
               <button
+                type="button"
                 onClick={() => setUnlockedFilter('common')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   unlockedFilter === 'common' 
@@ -516,6 +522,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
                 ⚪ Común
               </button>
               <button
+                type="button"
                 onClick={() => setUnlockedFilter('rare')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   unlockedFilter === 'rare' 
@@ -527,6 +534,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
                 🔵 Raro
               </button>
               <button
+                type="button"
                 onClick={() => setUnlockedFilter('epic')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   unlockedFilter === 'epic' 
@@ -538,6 +546,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
                 🟣 Épico
               </button>
               <button
+                type="button"
                 onClick={() => setUnlockedFilter('legendary')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   unlockedFilter === 'legendary' 
@@ -587,6 +596,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
             </h3>
             <div className="flex flex-wrap items-center gap-1.5">
               <button
+                type="button"
                 onClick={() => setLockedFilter('all')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   lockedFilter === 'all' 
@@ -597,6 +607,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
                 Todos
               </button>
               <button
+                type="button"
                 onClick={() => setLockedFilter('common')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   lockedFilter === 'common' 
@@ -607,6 +618,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
                 ⚪ Común
               </button>
               <button
+                type="button"
                 onClick={() => setLockedFilter('rare')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   lockedFilter === 'rare' 
@@ -618,6 +630,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
                 🔵 Raro
               </button>
               <button
+                type="button"
                 onClick={() => setLockedFilter('epic')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   lockedFilter === 'epic' 
@@ -629,6 +642,7 @@ export function Achievements({ members, tasks, currentUser }: AchievementsProps)
                 🟣 Épico
               </button>
               <button
+                type="button"
                 onClick={() => setLockedFilter('legendary')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   lockedFilter === 'legendary' 

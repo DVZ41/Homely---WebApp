@@ -1,23 +1,73 @@
-<<<<<<< HEAD
-# 🏠 HOMELY - Documentación Técnica
+# 🏠 HOMELY - Gestión de Tareas Familiares
 
-> **Aplicación de gestión de tareas domésticas con gamificación**  
-> React + TypeScript + Tailwind CSS v4
+> **Aplicación web para organizar tareas del hogar con gamificación**  
+> React + TypeScript + Tailwind CSS
 
 ---
 
-## 📑 Índice
+## 🚀 EMPIEZA AQUÍ
 
-1. [Descripción General](#-descripción-general)
-2. [Arquitectura del Proyecto](#-arquitectura-del-proyecto)
-3. [Estructura de Archivos](#-estructura-de-archivos)
-4. [Tipos de Datos](#-tipos-de-datos)
-5. [Gestión de Estado](#-gestión-de-estado)
-6. [Componentes Principales](#-componentes-principales)
-7. [Sistema de Persistencia](#-sistema-de-persistencia)
-8. [Sistema de Notificaciones](#-sistema-de-notificaciones)
-9. [Sistema de Gamificación](#-sistema-de-gamificación)
-10. [Guía de Desarrollo](#-guía-de-desarrollo)
+**¿Nuevo en HOMELY?** → Lee [DOCUMENTACIÓN COMPLETA](./docs/INDEX.md)
+
+**¿Quieres entender cómo funciona?** → Lee [Guía Rápida de Inicio](./docs/getting-started/00-INICIO.md) (10 minutos)
+
+**¿Quieres empezar a codear?** → Lee [Comandos Diarios](./docs/getting-started/02-comandos-diarios.md)
+
+**¿Quieres contribuir?** → Lee [Cómo Contribuir](./docs/guides/CONTRIBUIR.md)
+
+---
+
+## ⚡ QUICK START
+
+```bash
+# 1. Instalar
+npm install
+
+# 2. Iniciar
+npm run dev
+
+# 3. Abrir navegador
+# http://localhost:5173
+```
+
+---
+
+## 📚 DOCUMENTACIÓN
+
+Toda la documentación está en la carpeta `docs/` organizada por tema:
+
+| Sección | Archivos | Para |
+|---------|----------|------|
+| **Getting Started** | [0](./docs/getting-started/00-INICIO.md) [1](./docs/getting-started/01-que-es-homely.md) [2](./docs/getting-started/02-comandos-diarios.md) | Nuevo miembro |
+| **Guides** | [Contribuir](./docs/guides/CONTRIBUIR.md) | Desarrolladores |
+| **Architecture** | [ARQUITECTURA.md](./docs/architecture/ARQUITECTURA.md) | Entender código |
+| **Reference** | [Quick Ref](./docs/reference/QUICK_REFERENCE.md) | Búsqueda rápida |
+| **Team** | [Criteria](./docs/team/CRITERIOS-REVIEW.md) | Equipo |
+
+📍 **Índice Completo:** [docs/INDEX.md](./docs/INDEX.md)
+
+---
+
+## 📑 Descripción General
+
+**Homely** es una aplicación web para la gestión colaborativa de tareas del hogar, diseñada para familias y compañeros de piso. Incluye:
+
+- ✅ Gestión de tareas (Kanban + tabla)
+- 👥 Sistema de miembros
+- 🎮 Gamificación (puntos, badges, recompensas)
+- 📊 Estadísticas y rankings
+- 🔔 Notificaciones
+- 🌙 Modo oscuro
+
+### Stack Tecnológico
+
+| Tecnología | Versión | Uso |
+|------------|---------|-----|
+| React | 18.x | Framework UI |
+| TypeScript | 5.x | Tipado estático |
+| Tailwind CSS | 4.x | Estilos |
+| Vite | 5.x | Build tool |
+| shadcn/ui | Latest | 40+ Componentes UI |
 
 ---
 
@@ -98,23 +148,20 @@ project/
 │
 ├── components/                  # Componentes React
 │   ├── Achievements.tsx         # Vista de logros y badges
-│   ├── Dashboard.tsx            # Dashboard original (deprecated)
 │   ├── DashboardPro.tsx         # Dashboard principal con calendario
+│   ├── LazyComponents.tsx        # Componentes con code-splitting (Lazy loading)
+│   ├── Logo.tsx                 # Logo de la aplicación
 │   ├── Members.tsx              # Gestión de miembros
 │   ├── MyTasks.tsx              # Vista de tareas del usuario actual
 │   ├── NotificationBell.tsx     # Icono de notificaciones con badge
 │   ├── Notifications.tsx        # Panel de notificaciones
 │   ├── Profile.tsx              # Perfil de usuario
-│   ├── QuickActionButton.tsx    # Botón de acción rápida flotante
+│   ├── ProgresoGeneralCard.tsx  # Tarjeta de progreso general
 │   ├── Rewards.tsx              # Sistema de recompensas
 │   ├── Settings.tsx             # Configuración de la app
-│   ├── Statistics.tsx           # Estadísticas y gráficos
+│   ├── Statistics.tsx           # Estadísticas y gráficos (Lazy loaded)
 │   ├── TaskList.tsx             # Vista principal de tareas (Kanban/Tabla)
-│   ├── UpcomingTaskCard.tsx     # Tarjeta de tarea próxima
 │   └── UserAvatar.tsx           # Componente de avatar
-│   │
-│   ├── figma/                   # Componentes auxiliares de diseño
-│   │   └── ImageWithFallback.tsx
 │   │
 │   └── ui/                      # Componentes UI base (shadcn/ui)
 │       ├── button.tsx
@@ -131,9 +178,6 @@ project/
 │
 ├── styles/                      # Estilos globales
 │   └── globals.css              # Variables CSS, Tailwind, dark mode
-│
-├── guidelines/                  # Documentación de diseño
-│   └── Guidelines.md
 │
 ├── DESIGN_SYSTEM.md             # Sistema de diseño (hovers, interacciones)
 └── README.md                    # Esta documentación

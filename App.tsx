@@ -28,14 +28,12 @@
 import { useState, useEffect } from 'react';
 import { DashboardPro as Dashboard } from './components/DashboardPro';
 import { TaskList } from './components/TaskList';
-import { Statistics } from './components/Statistics';
+import { LazyStatistics, LazyAchievements, LazyRewards } from './components/LazyComponents';
 import { Members } from './components/Members';
-import { Rewards } from './components/Rewards';
 import { MyTasks } from './components/MyTasks';
 import { Notifications } from './components/Notifications';
 import { Profile } from './components/Profile';
 import { Settings } from './components/Settings';
-import { Achievements } from './components/Achievements';
 import { NotificationBell } from './components/NotificationBell';
 import { UserAvatar } from './components/UserAvatar';
 import { Logo } from './components/Logo';
@@ -226,10 +224,6 @@ function App() {
         !permanentProcessedTasks.has(task.id);    // No la hemos procesado nunca
 
       if (!shouldCreateNext) {
-        // Debug: mostrar por qué no se crea
-        if (task.status === 'completed' && task.recurrence && task.recurrence !== 'puntual' && permanentProcessedTasks.has(task.id)) {
-          console.log(`ℹ️ Tarea "${task.title}" ya fue procesada anteriormente (ID: ${task.id})`);
-        }
         return;
       }
 
@@ -244,7 +238,6 @@ function App() {
       const nextDueDate = calculateNextRecurrenceDate(baseDate, task.recurrence);
 
       if (!nextDueDate) {
-        console.warn(`⚠️ No se pudo calcular próxima fecha para tarea: ${task.title}`);
         return;
       }
 
@@ -258,17 +251,8 @@ function App() {
       );
 
       if (duplicateExists) {
-        console.log(`ℹ️ Tarea recurrente ya existe para ${task.title} en ${nextDueDate}`);
         return;
       }
-
-      // Log para debugging
-      console.log('🔄 TAREA RECURRENTE CREADA AUTOMÁTICAMENTE');
-      console.log(`   📝 Título: ${task.title}`);
-      console.log(`   🔁 Tipo: ${task.recurrence}`);
-      console.log(`   📅 Vencía: ${task.dueDate}`);
-      console.log(`   📅 Nueva fecha: ${nextDueDate}`);
-      console.log(`   👥 Sin asignar (rotación)`);
 
       // Crear la nueva tarea recurrente
       addTask({
@@ -1707,7 +1691,7 @@ function App() {
             />
           )}
           {activeTab === 'stats' && (
-            <Statistics tasks={tasks} members={members} />
+            <LazyStatistics tasks={tasks} members={members} />
           )}
           {activeTab === 'members' && (
             <Members
@@ -1719,7 +1703,7 @@ function App() {
             />
           )}
           {activeTab === 'rewards' && (
-            <Rewards
+            <LazyRewards
               rewards={rewards}
               members={members}
               redemptions={redemptions}
@@ -1730,7 +1714,7 @@ function App() {
             />
           )}
           {activeTab === 'achievements' && (
-            <Achievements
+            <LazyAchievements
               members={members}
               tasks={tasks}
               currentUser={currentUser || members[0]}

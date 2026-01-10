@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, User, Clock, TrendingUp, CheckCircle2, Zap, Star, CheckCircle, Plus, Users as UsersIcon, Award, Gift, Trophy, RotateCcw } from 'lucide-react';
+import { AlertCircle, User, Clock, TrendingUp, CheckCircle2, Zap, Star, CheckCircle, Plus, Users as UsersIcon, RotateCcw } from 'lucide-react';
 import { Activity, Member } from '../App';
 
 export type ProgresoGeneralStats = {

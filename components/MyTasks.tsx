@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Member, Task } from '../App';
-import { CheckCircle2, Clock, AlertCircle, Star, Calendar, Target, Zap, TrendingUp, Search, ArrowUpDown, X, User, Edit2, Trash2, Columns3, List, Info, Plus } from 'lucide-react';
+import { CheckCircle2, Clock, AlertCircle, Star, TrendingUp, Search, ArrowUpDown, X, User, Edit2, Trash2, Columns3, List, Info, Plus } from 'lucide-react';
 import { getCategoryConfig, getCategoryClasses, CATEGORIES } from '../lib/categoryUtils';
 
 type MyTasksProps = {
@@ -16,13 +16,13 @@ type MyTasksProps = {
 };
 
 export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask, highlightedTaskId, onClearHighlight, onNavigateToTasks, onScrollToMyOverdue }: MyTasksProps) {
-  const [selectedMemberId, setSelectedMemberId] = useState<string>(members[0]?.id || '');
+  const [selectedMemberId] = useState<string>(members[0]?.id || '');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'date' | 'priority' | 'points' | 'category'>('date');
   const [draggedTask, setDraggedTask] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('kanban');
-  const taskRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  // const taskRefs = useRef<{ [key: string]: HTMLDivElement | null }>({}); // Eliminado: no se usa
   const [unassignedTaskDialog, setUnassignedTaskDialog] = useState<{
     open: boolean;
     task: Task | null;
@@ -101,15 +101,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
 
   // Task statistics by category
   const categories = Object.values(CATEGORIES).map(c => c.name);
-  const categoryStats = categories
-    .map(categoryName => {
-      const categoryTasks = myTasks.filter(t => t.category === categoryName);
-      return {
-        name: categoryName,
-        total: categoryTasks.length,
-      };
-    })
-    .filter(c => c.total > 0);
+  // const categoryStats = ... // Eliminado: no se usa
 
   // Drag and Drop handlers
   const handleDragStart = (taskId: string) => {
@@ -189,8 +181,10 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                   status: 'pending',
                   category: 'otros',
                   createdAt: new Date().toISOString(),
-                  isRecurring: false,
-                  recurringDays: [],
+                  // isRecurring: false, // Eliminado: no existe en Task
+                  // recurringDays: [], // Eliminado: no existe en Task
+                  type: '',
+                  recurrence: 'puntual',
                   comments: []
                 };
                 onEditTask(emptyTask);
@@ -342,7 +336,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
             </label>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as 'date' | 'priority' | 'points' | 'category')}
               title="Ordenar tareas"
               className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
@@ -871,7 +865,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                                   onUpdateTask(task.id, { status: 'completed' });
                                 }}
                                 className="p-1.5 text-success hover:bg-success/10 rounded transition-colors"
-                                title="Completar"
+                                title="Completar tarea"
                               >
                                 <CheckCircle2 className="w-4 h-4" />
                               </button>
@@ -924,6 +918,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
               <button
                 onClick={() => setUnassignedTaskDialog({ open: false, task: null, intendedAction: '' })}
                 className="text-muted-foreground hover:text-foreground transition-colors"
+                title="Cerrar diálogo"
               >
                 <X className="w-5 h-5" />
               </button>

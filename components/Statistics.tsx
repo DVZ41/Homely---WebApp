@@ -1,8 +1,7 @@
 import { Member, Task } from '../App';
 import { useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line } from 'recharts';
 import { TrendingUp, Star, CheckCircle2, Clock } from 'lucide-react';
-import { CATEGORIES } from '../lib/categoryUtils';
 
 // Colores usando CSS variables para reactividad al tema
 const CHART_COLORS = {
@@ -38,17 +37,17 @@ export function Statistics({ tasks, members }: StatisticsProps) {
   }, [tasks, members]);
 
   // Memoizar tareas por categoría
-  const tasksByCategory = useMemo(() => {
-    return Object.values(CATEGORIES).map(catConfig => {
-      const catTasks = tasks.filter(t => t.category === catConfig.name);
-      return {
-        name: catConfig.name,
-        completadas: catTasks.filter(t => t.status === 'completed').length,
-        pendientes: catTasks.filter(t => t.status !== 'completed').length,
-        total: catTasks.length,
-      };
-    }).filter(item => item.total > 0);
-  }, [tasks]);
+  // const tasksByCategory = useMemo(() => {
+  //   return Object.values(CATEGORIES).map(catConfig => {
+  //     const catTasks = tasks.filter(t => t.category === catConfig.name);
+  //     return {
+  //       name: catConfig.name,
+  //       completadas: catTasks.filter(t => t.status === 'completed').length,
+  //       pendientes: catTasks.filter(t => t.status !== 'completed').length,
+  //       total: catTasks.length,
+  //     };
+  //   }).filter(item => item.total > 0);
+  // }, [tasks]);
 
   // Memoizar tareas por estado
   const tasksByStatus = useMemo(() => [
@@ -267,11 +266,11 @@ export function Statistics({ tasks, members }: StatisticsProps) {
                   border: `1px solid ${tooltipBorder}`,
                   borderRadius: '8px'
                 }}
-                formatter={(value: any, name: string, props: any) => {
-                  const dataKey = props.dataKey;
+                formatter={(value: any, name: string | undefined, props: any) => {
+                  const dataKey = props?.dataKey;
                   if (dataKey === 'completadas') return [value, 'Completadas'];
                   if (dataKey === 'total') return [value, 'Total programadas'];
-                  return [value, name];
+                  return [value, name || 'Valor'];
                 }}
               />
               <Line 
