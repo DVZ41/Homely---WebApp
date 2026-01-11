@@ -10,30 +10,74 @@ type RewardsProps = {
   onDeleteReward: (id: string) => void;
   onRedeemReward: (rewardId: string, memberId: string) => boolean;
   onUpdateRedemptionStatus: (redemptionId: string, status: 'pending' | 'used') => void;
+  currentUserId: string | null;
+  onChangeUser: (userId: string) => void;
 };
 
 const iconOptions = [
-  '🎁', '🎉', '🌟', '💎', '🏆', // Premios generales
-  '🏠', '🛋️', '🛏️', '☕', '🍪', // Hogar y descanso
-  '🎬', '📺', '🎮', '🎵', '📚', // Entretenimiento
-  '🍕', '🍰', '🍔', '🍿', '🍦', // Comida
-  '🏖️', '✈️', '🚗', '🎈', '🎊', // Salidas y celebraciones
-  '⚽', '🏀', '🎾', '🎸', '🎨', // Deportes y hobbies
-  '🛒', '🪴', '🌺', '🧺', '🛁', // Tareas del hogar y cuidado
-  '🎯', '🎲', '🎪', '🎭', '🎤', // Actividades especiales
+  '🎁',
+  '🎉',
+  '🌟',
+  '💎',
+  '🏆', // Premios generales
+  '🏠',
+  '🛋️',
+  '🛏️',
+  '☕',
+  '🍪', // Hogar y descanso
+  '🎬',
+  '📺',
+  '🎮',
+  '🎵',
+  '📚', // Entretenimiento
+  '🍕',
+  '🍰',
+  '🍔',
+  '🍿',
+  '🍦', // Comida
+  '🏖️',
+  '✈️',
+  '🚗',
+  '🎈',
+  '🎊', // Salidas y celebraciones
+  '⚽',
+  '🏀',
+  '🎾',
+  '🎸',
+  '🎨', // Deportes y hobbies
+  '🛒',
+  '🪴',
+  '🌺',
+  '🧺',
+  '🛁', // Tareas del hogar y cuidado
+  '🎯',
+  '🎲',
+  '🎪',
+  '🎭',
+  '🎤', // Actividades especiales
 ];
 
-export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteReward, onRedeemReward, onUpdateRedemptionStatus }: RewardsProps) {
+export function Rewards({
+  rewards,
+  members,
+  redemptions,
+  onAddReward,
+  onDeleteReward,
+  onRedeemReward,
+  onUpdateRedemptionStatus,
+  currentUserId,
+  onChangeUser: _onChangeUser,
+}: RewardsProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [selectedMember, setSelectedMember] = useState<string>('');
   const [showRedeemModal, setShowRedeemModal] = useState(false);
 
-  // Usuario actual (primer miembro por defecto)
-  const currentUser = members[0];
-  
+  // Usuario actual (dinámico desde prop, fallback a primer miembro)
+  const currentUser = members.find((m) => m.id === currentUserId) || members[0];
+
   // Filtrar recompensas del usuario actual
-  const myRedemptions = currentUser ? redemptions.filter(r => r.memberId === currentUser.id) : [];
+  const myRedemptions = currentUser ? redemptions.filter((r) => r.memberId === currentUser.id) : [];
 
   const [formData, setFormData] = useState({
     title: '',
@@ -83,38 +127,48 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
             <p className="text-sm text-muted-foreground">Canjea tus puntos por premios</p>
           </div>
           <button
-          onClick={() => setIsAdding(true)}
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover hover:scale-105 hover:shadow-lg transition-all duration-200"
-        >
-          <Plus className="w-4 h-4" />
-          Nueva Recompensa
-        </button>
+            onClick={() => setIsAdding(true)}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover hover:scale-105 hover:shadow-lg transition-all duration-200"
+          >
+            <Plus className="w-4 h-4" />
+            Nueva Recompensa
+          </button>
         </div>
       </div>
 
       {/* Member Points Overview */}
       <div className="bg-linear-to-br from-xp/10 via-primary/5 to-xp/10 rounded-2xl p-5 border border-xp/20 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
-          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-xp/20 shadow-sm" style={{ color: 'var(--xp)' }}>
+          <div
+            className="flex items-center justify-center w-10 h-10 rounded-lg bg-xp/20 shadow-sm"
+            style={{ color: 'var(--xp)' }}
+          >
             <Star className="w-5 h-5" />
           </div>
           <h3 className="text-lg font-semibold text-foreground">Puntos del Equipo</h3>
         </div>
-        
+
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {members.length === 0 ? (
-            <p className="col-span-full text-muted-foreground text-sm">No hay miembros registrados</p>
+            <p className="col-span-full text-muted-foreground text-sm">
+              No hay miembros registrados
+            </p>
           ) : (
-            members.map(member => (
-              <div key={member.id} className="bg-card/50 rounded-lg p-3 border border-border/50 backdrop-blur-sm hover:border-xp/30 transition-colors">
+            members.map((member) => (
+              <div
+                key={member.id}
+                className="bg-card/50 rounded-lg p-3 border border-border/50 backdrop-blur-sm hover:border-xp/30 transition-colors"
+              >
                 <div className="flex items-center gap-2 mb-2">
-                  <div 
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-lg shadow-sm" 
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-lg shadow-sm"
                     style={{ backgroundColor: member.color }}
                   >
                     {member.avatar}
                   </div>
-                  <span className="text-foreground text-sm font-medium truncate">{member.name}</span>
+                  <span className="text-foreground text-sm font-medium truncate">
+                    {member.name}
+                  </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="text-xl font-bold text-foreground">{member.points}</span>
@@ -132,11 +186,13 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
           <div className="flex items-center gap-2 mb-4">
             <Gift className="w-5 h-5 text-primary" />
             <h3 className="text-lg font-bold text-foreground">Mis Recompensas</h3>
-            <span className="text-xs text-muted-foreground">({myRedemptions.length} canjeadas)</span>
+            <span className="text-xs text-muted-foreground">
+              ({myRedemptions.length} canjeadas)
+            </span>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {myRedemptions.map(redemption => {
+            {myRedemptions.map((redemption) => {
               const timeAgo = new Date(redemption.redeemedAt).toLocaleDateString('es-ES', {
                 day: 'numeric',
                 month: 'short',
@@ -182,7 +238,9 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
                         ? 'bg-success/10 text-success border border-success/20 hover:bg-success/20'
                         : 'bg-info/10 text-info border border-info/20 hover:bg-info/20'
                     }`}
-                    title={redemption.status === 'used' ? 'Marcar como pendiente' : 'Marcar como usada'}
+                    title={
+                      redemption.status === 'used' ? 'Marcar como pendiente' : 'Marcar como usada'
+                    }
                   >
                     {redemption.status === 'used' ? (
                       <>
@@ -209,11 +267,13 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
           <div className="flex items-center gap-2 mb-4">
             <History className="w-5 h-5 text-muted-foreground" />
             <h3 className="text-lg font-bold text-foreground">Historial del Equipo</h3>
-            <span className="text-xs text-muted-foreground">({redemptions.length} Total canjeadas)</span>
+            <span className="text-xs text-muted-foreground">
+              ({redemptions.length} Total canjeadas)
+            </span>
           </div>
-          
+
           <div className="space-y-2">
-            {redemptions.slice(0, 8).map(redemption => {
+            {redemptions.slice(0, 8).map((redemption) => {
               const timeAgo = new Date(redemption.redeemedAt).toLocaleDateString('es-ES', {
                 day: 'numeric',
                 month: 'short',
@@ -296,7 +356,9 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-semibold text-foreground">Nueva Recompensa</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Crea una recompensa para motivar al equipo</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Crea una recompensa para motivar al equipo
+                  </p>
                 </div>
                 <button
                   onClick={() => {
@@ -318,88 +380,92 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
 
             <div className="p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm text-muted-foreground mb-2">Título *</label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                required
-                className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Ej: Elegir película"
-              />
-            </div>
+                <div>
+                  <label className="block text-sm text-muted-foreground mb-2">Título *</label>
+                  <input
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    required
+                    className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Ej: Elegir película"
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm text-muted-foreground mb-2">Descripción *</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                required
-                rows={3}
-                className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Descripción de la recompensa"
-              />
-            </div>
+                <div>
+                  <label className="block text-sm text-muted-foreground mb-2">Descripción *</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    required
+                    rows={3}
+                    className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Descripción de la recompensa"
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm text-muted-foreground mb-2">Costo en puntos *</label>
-              <input
-                type="number"
-                value={formData.pointsCost}
-                onChange={(e) => setFormData({ ...formData, pointsCost: parseInt(e.target.value) || 0 })}
-                required
-                min="1"
-                title="Introduce el costo en puntos de la recompensa"
-                placeholder="50"
-                className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
+                <div>
+                  <label className="block text-sm text-muted-foreground mb-2">
+                    Costo en puntos *
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.pointsCost}
+                    onChange={(e) =>
+                      setFormData({ ...formData, pointsCost: parseInt(e.target.value) || 0 })
+                    }
+                    required
+                    min="1"
+                    title="Introduce el costo en puntos de la recompensa"
+                    placeholder="50"
+                    className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm text-muted-foreground mb-2">Icono</label>
-              <div className="grid grid-cols-8 gap-2">
-                {iconOptions.map(icon => (
+                <div>
+                  <label className="block text-sm text-muted-foreground mb-2">Icono</label>
+                  <div className="grid grid-cols-8 gap-2">
+                    {iconOptions.map((icon) => (
+                      <button
+                        key={icon}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, icon })}
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl border-2 transition-all ${
+                          formData.icon === icon
+                            ? 'border-primary bg-primary/10 scale-110'
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        {icon}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-2">
                   <button
-                    key={icon}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, icon })}
-                    className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl border-2 transition-all ${
-                      formData.icon === icon
-                        ? 'border-primary bg-primary/10 scale-110'
-                        : 'border-border hover:border-primary/50'
-                    }`}
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover hover:scale-105 hover:shadow-lg transition-all duration-200"
                   >
-                    {icon}
+                    Crear recompensa
                   </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover hover:scale-105 hover:shadow-lg transition-all duration-200"
-              >
-                Crear recompensa
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsAdding(false);
-                  setFormData({
-                    title: '',
-                    description: '',
-                    pointsCost: 50,
-                    icon: '🎁',
-                  });
-                }}
-                className="px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAdding(false);
+                      setFormData({
+                        title: '',
+                        description: '',
+                        pointsCost: 50,
+                        icon: '🎁',
+                      });
+                    }}
+                    className="px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -410,11 +476,13 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
         <div className="bg-card rounded-xl p-12 shadow-sm border border-border text-center">
           <Gift className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
           <p className="text-muted-foreground">No hay recompensas disponibles</p>
-          <p className="text-sm text-muted-foreground mt-2">Crea recompensas para motivar al equipo</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Crea recompensas para motivar al equipo
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {rewards.map(reward => (
+          {rewards.map((reward) => (
             <div
               key={reward.id}
               className="bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-lg transition-all hover:scale-105"
@@ -463,7 +531,7 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
         <div className="fixed inset-0 bg-background/50 flex items-center justify-center p-4 z-50">
           <div className="bg-card rounded-xl p-6 max-w-md w-full shadow-2xl border border-border">
             <h3 className="text-foreground mb-4">Canjear Recompensa</h3>
-            
+
             <div className="bg-primary/5 rounded-lg p-4 mb-4 border border-primary/10">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-3xl">{selectedReward.icon}</span>
@@ -479,7 +547,9 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm text-muted-foreground mb-2">¿Quién canjea esta recompensa?</label>
+              <label className="block text-sm text-muted-foreground mb-2">
+                ¿Quién canjea esta recompensa?
+              </label>
               <select
                 value={selectedMember}
                 onChange={(e) => setSelectedMember(e.target.value)}
@@ -487,11 +557,12 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
                 className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">Selecciona un miembro</option>
-                {members.map(member => {
+                {members.map((member) => {
                   const canAfford = member.points >= selectedReward.pointsCost;
                   return (
                     <option key={member.id} value={member.id} disabled={!canAfford}>
-                      {member.avatar} {member.name} ({member.points} pts) {!canAfford && '- No tiene suficientes puntos'}
+                      {member.avatar} {member.name} ({member.points} pts){' '}
+                      {!canAfford && '- No tiene suficientes puntos'}
                     </option>
                   );
                 })}
@@ -502,7 +573,7 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
               <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-4 text-sm">
                 <p className="text-foreground">
                   {(() => {
-                    const member = members.find(m => m.id === selectedMember);
+                    const member = members.find((m) => m.id === selectedMember);
                     if (member) {
                       const remaining = member.points - selectedReward.pointsCost;
                       return remaining >= 0
@@ -518,10 +589,13 @@ export function Rewards({ rewards, members, redemptions, onAddReward, onDeleteRe
             <div className="flex gap-3">
               <button
                 onClick={handleRedeem}
-                disabled={!selectedMember || (() => {
-                  const member = members.find(m => m.id === selectedMember);
-                  return !member || member.points < selectedReward.pointsCost;
-                })()}
+                disabled={
+                  !selectedMember ||
+                  (() => {
+                    const member = members.find((m) => m.id === selectedMember);
+                    return !member || member.points < selectedReward.pointsCost;
+                  })()
+                }
                 className="flex-1 px-4 py-2 bg-linear-to-r from-primary to-primary-hover text-white rounded-lg hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Confirmar canje

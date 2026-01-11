@@ -1,6 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Member, Task } from '../App';
-import { CheckCircle2, Clock, AlertCircle, Star, TrendingUp, Search, ArrowUpDown, X, User, Edit2, Trash2, Columns3, List, Info, Plus } from 'lucide-react';
+import {
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Star,
+  TrendingUp,
+  Search,
+  ArrowUpDown,
+  X,
+  User,
+  Edit2,
+  Trash2,
+  Columns3,
+  List,
+  Info,
+  Plus,
+} from 'lucide-react';
 import { getCategoryConfig, getCategoryClasses, CATEGORIES } from '../lib/categoryUtils';
 
 type MyTasksProps = {
@@ -13,15 +29,32 @@ type MyTasksProps = {
   onClearHighlight?: () => void;
   onNavigateToTasks?: (highlightType?: 'overdue-unassigned' | 'unassigned') => void;
   onScrollToMyOverdue?: () => void;
+  currentUserId: string | null;
+  onChangeUser: (userId: string) => void;
 };
 
-export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask, highlightedTaskId, onClearHighlight, onNavigateToTasks, onScrollToMyOverdue }: MyTasksProps) {
-  const [selectedMemberId] = useState<string>(members[0]?.id || '');
+export function MyTasks({
+  tasks,
+  members,
+  onUpdateTask,
+  onDeleteTask,
+  onEditTask,
+  highlightedTaskId,
+  onClearHighlight,
+  onNavigateToTasks,
+  onScrollToMyOverdue,
+  currentUserId,
+  onChangeUser: _onChangeUser,
+}: MyTasksProps) {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'date' | 'priority' | 'points' | 'category'>('date');
   const [draggedTask, setDraggedTask] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('kanban');
+
+  // Usuario actual (dinámico desde prop, fallback a primer miembro)
+  const currentUser = members.find((m) => m.id === currentUserId) || members[0];
+  const selectedMemberId = currentUser?.id || '';
   // const taskRefs = useRef<{ [key: string]: HTMLDivElement | null }>({}); // Eliminado: no se usa
   const [unassignedTaskDialog, setUnassignedTaskDialog] = useState<{
     open: boolean;
@@ -30,11 +63,11 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
   }>({
     open: false,
     task: null,
-    intendedAction: ''
+    intendedAction: '',
   });
 
-  const selectedMember = members.find(m => m.id === selectedMemberId);
-  
+  const selectedMember = members.find((m) => m.id === selectedMemberId);
+
   if (!selectedMember) {
     return (
       <div className="text-center py-12">
@@ -44,20 +77,20 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
   }
 
   // Filter tasks for selected member
-  const myTasks = tasks.filter(t => t.assignedTo === selectedMemberId);
-  
+  const myTasks = tasks.filter((t) => t.assignedTo === selectedMemberId);
+
   // Filter by category
-  let filteredTasks = categoryFilter === 'all' 
-    ? myTasks 
-    : myTasks.filter(t => t.category === categoryFilter);
-  
+  let filteredTasks =
+    categoryFilter === 'all' ? myTasks : myTasks.filter((t) => t.category === categoryFilter);
+
   // Apply search filter
   if (searchQuery.trim()) {
     const query = searchQuery.toLowerCase();
-    filteredTasks = filteredTasks.filter(t => 
-      t.title.toLowerCase().includes(query) || 
-      (t.description && t.description.toLowerCase().includes(query)) ||
-      t.category.toLowerCase().includes(query)
+    filteredTasks = filteredTasks.filter(
+      (t) =>
+        t.title.toLowerCase().includes(query) ||
+        (t.description && t.description.toLowerCase().includes(query)) ||
+        t.category.toLowerCase().includes(query)
     );
   }
 
@@ -69,7 +102,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
     const bOverdue = b.dueDate < today && b.status !== 'completed';
     if (aOverdue && !bOverdue) return -1;
     if (!aOverdue && bOverdue) return 1;
-    
+
     // Then apply selected sorting
     switch (sortBy) {
       case 'date':
@@ -87,20 +120,24 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
   });
 
   const today = new Date().toISOString().split('T')[0];
-  const pendingTasks = sortedTasks.filter(t => t.status === 'pending');
-  const inProgressTasks = sortedTasks.filter(t => t.status === 'in-progress');
-  const completedTasks = sortedTasks.filter(t => t.status === 'completed');
-  const overdueTasks = myTasks.filter(t => t.dueDate < today && t.status !== 'completed');
-  const dueTodayTasks = myTasks.filter(t => t.dueDate === today && t.status !== 'completed');
-  
+  const pendingTasks = sortedTasks.filter((t) => t.status === 'pending');
+  const inProgressTasks = sortedTasks.filter((t) => t.status === 'in-progress');
+  const completedTasks = sortedTasks.filter((t) => t.status === 'completed');
+  const overdueTasks = myTasks.filter((t) => t.dueDate < today && t.status !== 'completed');
+  const dueTodayTasks = myTasks.filter((t) => t.dueDate === today && t.status !== 'completed');
+
   // Tareas sin asignar disponibles
-  const unassignedTasks = tasks.filter(t => !t.assignedTo || t.assignedTo === '');
-  const unassignedOverdueTasks = unassignedTasks.filter(t => t.dueDate < today && t.status !== 'completed');
+  const unassignedTasks = tasks.filter((t) => !t.assignedTo || t.assignedTo === '');
+  const unassignedOverdueTasks = unassignedTasks.filter(
+    (t) => t.dueDate < today && t.status !== 'completed'
+  );
   // Tareas sin asignar NO atrasadas y NO completadas
-  const unassignedPendingTasks = unassignedTasks.filter(t => t.status !== 'completed' && t.dueDate >= today);
+  const unassignedPendingTasks = unassignedTasks.filter(
+    (t) => t.status !== 'completed' && t.dueDate >= today
+  );
 
   // Task statistics by category
-  const categories = Object.values(CATEGORIES).map(c => c.name);
+  const categories = Object.values(CATEGORIES).map((c) => c.name);
   // const categoryStats = ... // Eliminado: no se usa
 
   // Drag and Drop handlers
@@ -114,12 +151,17 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
 
   const handleDrop = (newStatus: Task['status']) => {
     if (draggedTask) {
-      const task = tasks.find(t => t.id === draggedTask);
+      const task = tasks.find((t) => t.id === draggedTask);
       if (task && !task.assignedTo) {
         setUnassignedTaskDialog({
           open: true,
           task: task,
-          intendedAction: newStatus === 'in-progress' ? 'iniciar' : newStatus === 'completed' ? 'completar' : 'mover'
+          intendedAction:
+            newStatus === 'in-progress'
+              ? 'iniciar'
+              : newStatus === 'completed'
+              ? 'completar'
+              : 'mover',
         });
         setDraggedTask(null);
         return;
@@ -135,7 +177,9 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
     dueTodayTasks: dueTodayTasks.length,
     inProgressTasks: inProgressTasks.length,
     completedTasks: completedTasks.length,
-    totalPoints: myTasks.filter(t => t.status !== 'completed').reduce((sum, task) => sum + task.points, 0),
+    totalPoints: myTasks
+      .filter((t) => t.status !== 'completed')
+      .reduce((sum, task) => sum + task.points, 0),
   };
 
   // Hacer scroll a la tarea resaltada cuando se recibe highlightedTaskId
@@ -185,7 +229,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                   // recurringDays: [], // Eliminado: no existe en Task
                   type: '',
                   recurrence: 'puntual',
-                  comments: []
+                  comments: [],
                 };
                 onEditTask(emptyTask);
               }
@@ -255,7 +299,9 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
       </div>
 
       {/* Alerts Section - Compact Badges */}
-      {(overdueTasks.length > 0 || unassignedOverdueTasks.length > 0 || unassignedPendingTasks.length > 0) && (
+      {(overdueTasks.length > 0 ||
+        unassignedOverdueTasks.length > 0 ||
+        unassignedPendingTasks.length > 0) && (
         <div className="flex flex-wrap gap-2">
           {/* User's Overdue Tasks */}
           {overdueTasks.length > 0 && (
@@ -323,8 +369,10 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
               className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">Todas</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
               ))}
             </select>
           </div>
@@ -336,7 +384,9 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
             </label>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'date' | 'priority' | 'points' | 'category')}
+              onChange={(e) =>
+                setSortBy(e.target.value as 'date' | 'priority' | 'points' | 'category')
+              }
               title="Ordenar tareas"
               className="w-full px-3 py-2 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
@@ -353,7 +403,8 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
           <div className="flex items-center gap-2 text-muted-foreground">
             <TrendingUp className="w-4 h-4" />
             <span>
-              {sortedTasks.length} {sortedTasks.length === 1 ? 'tarea encontrada' : 'tareas encontradas'}
+              {sortedTasks.length}{' '}
+              {sortedTasks.length === 1 ? 'tarea encontrada' : 'tareas encontradas'}
             </span>
           </div>
           <button
@@ -372,7 +423,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
 
       {/* View Toggle - Subtle */}
       <div className="px-2 py-2 flex items-center justify-between gap-1">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">📋 Mis Tareas</p>
+        <h3 className="text-lg font-semibold text-foreground">Mis Tareas</h3>
         <div className="flex gap-1">
           <button
             onClick={() => setViewMode('kanban')}
@@ -408,7 +459,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
         ) : viewMode === 'kanban' ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Pending Column */}
-            <div 
+            <div
               className="bg-card rounded-xl p-4 border border-border min-h-100"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop('pending')}
@@ -416,11 +467,9 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-3 h-3 rounded-full bg-warning"></div>
                 <h3 className="font-semibold text-foreground">Pendientes</h3>
-                <span className="ml-auto text-sm text-muted-foreground">
-                  {pendingTasks.length}
-                </span>
+                <span className="ml-auto text-sm text-muted-foreground">{pendingTasks.length}</span>
                 {(() => {
-                  const overdueInPending = pendingTasks.filter(t => t.dueDate < today).length;
+                  const overdueInPending = pendingTasks.filter((t) => t.dueDate < today).length;
                   if (overdueInPending > 0) {
                     return (
                       <span className="ml-1 px-1.5 py-0.5 bg-danger/20 text-danger text-xs font-semibold rounded">
@@ -432,11 +481,18 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                 })()}
               </div>
               <div className="space-y-3">
-                {pendingTasks.map(task => {
+                {pendingTasks.map((task) => {
                   const isOverdue = task.dueDate < today;
-                  const daysOverdue = isOverdue ? Math.abs(Math.floor((new Date(task.dueDate).getTime() - new Date(today).getTime()) / (1000 * 60 * 60 * 24))) : 0;
+                  const daysOverdue = isOverdue
+                    ? Math.abs(
+                        Math.floor(
+                          (new Date(task.dueDate).getTime() - new Date(today).getTime()) /
+                            (1000 * 60 * 60 * 24)
+                        )
+                      )
+                    : 0;
                   const isHighlighted = highlightedTaskId?.includes(task.id);
-                  
+
                   return (
                     <div
                       key={task.id}
@@ -446,8 +502,8 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                       className={`rounded-lg p-3 shadow-sm hover:shadow-md transition-all cursor-move ${
                         isHighlighted
                           ? 'ring-4 ring-primary border-2 border-primary bg-primary/20 shadow-lg shadow-primary/50 animate-pulse'
-                          : isOverdue 
-                          ? 'bg-danger/10 border-2 border-danger/50' 
+                          : isOverdue
+                          ? 'bg-danger/10 border-2 border-danger/50'
                           : 'bg-warning/5 border-2 border-warning/30'
                       }`}
                     >
@@ -463,21 +519,27 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                             <span className="text-xs bg-success/20 text-success px-1.5 py-0.5 rounded whitespace-nowrap">
                               🔄 {task.recurrence}
                             </span>
-                          ) : !isOverdue && (
-                            <span className="text-xs bg-muted/50 text-muted-foreground px-1.5 py-0.5 rounded whitespace-nowrap">
-                              ⏺ puntual
-                            </span>
+                          ) : (
+                            !isOverdue && (
+                              <span className="text-xs bg-muted/50 text-muted-foreground px-1.5 py-0.5 rounded whitespace-nowrap">
+                                ⏺ puntual
+                              </span>
+                            )
                           )}
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{task.description}</p>
+                      <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                        {task.description}
+                      </p>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {(() => {
                           const catConfig = getCategoryConfig(task.category);
                           const catClasses = getCategoryClasses(task.category);
                           const CatIcon = catConfig.icon;
                           return (
-                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${catClasses.badge}`}>
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${catClasses.badge}`}
+                            >
                               <CatIcon className="w-3 h-3" />
                               {task.category}
                             </span>
@@ -491,11 +553,13 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                           const urgencyConfig = {
                             high: { color: 'bg-danger/20 text-danger', label: 'Alta' },
                             medium: { color: 'bg-warning/20 text-warning', label: 'Media' },
-                            low: { color: 'bg-success/20 text-success', label: 'Baja' }
+                            low: { color: 'bg-success/20 text-success', label: 'Baja' },
                           };
                           const config = urgencyConfig[task.urgency];
                           return (
-                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${config.color}`}>
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${config.color}`}
+                            >
                               <AlertCircle className="w-3 h-3" />
                               {config.label}
                             </span>
@@ -503,12 +567,19 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                         })()}
                       </div>
                       <div className="flex items-center justify-between text-xs text-muted-foreground mb-3 pb-3 border-t border-border pt-3">
-                        <span className={`flex items-center gap-1 ${isOverdue ? 'text-danger font-semibold' : ''}`}>
+                        <span
+                          className={`flex items-center gap-1 ${
+                            isOverdue ? 'text-danger font-semibold' : ''
+                          }`}
+                        >
                           <Clock className="w-3 h-3" />
-                          {isOverdue 
-                            ? (daysOverdue === 0 ? 'Vencida hoy' : daysOverdue === 1 ? 'Hace 1 día' : `Hace ${daysOverdue} días`)
-                            : `Vence: ${new Date(task.dueDate).toLocaleDateString('es-ES')}`
-                          }
+                          {isOverdue
+                            ? daysOverdue === 0
+                              ? 'Vencida hoy'
+                              : daysOverdue === 1
+                              ? 'Hace 1 día'
+                              : `Hace ${daysOverdue} días`
+                            : `Vence: ${new Date(task.dueDate).toLocaleDateString('es-ES')}`}
                         </span>
                         <span className="flex items-center gap-1">
                           <User className="w-3 h-3" />
@@ -522,7 +593,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                               setUnassignedTaskDialog({
                                 open: true,
                                 task: task,
-                                intendedAction: 'iniciar'
+                                intendedAction: 'iniciar',
                               });
                               return;
                             }
@@ -540,7 +611,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
             </div>
 
             {/* In Progress Column */}
-            <div 
+            <div
               className="bg-card rounded-xl p-4 border border-border min-h-100"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop('in-progress')}
@@ -552,7 +623,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                   {inProgressTasks.length}
                 </span>
                 {(() => {
-                  const overdueInProgress = inProgressTasks.filter(t => t.dueDate < today).length;
+                  const overdueInProgress = inProgressTasks.filter((t) => t.dueDate < today).length;
                   if (overdueInProgress > 0) {
                     return (
                       <span className="ml-1 px-1.5 py-0.5 bg-danger/20 text-danger text-xs font-semibold rounded">
@@ -564,11 +635,18 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                 })()}
               </div>
               <div className="space-y-3">
-                {inProgressTasks.map(task => {
+                {inProgressTasks.map((task) => {
                   const isOverdue = task.dueDate < today;
-                  const daysOverdue = isOverdue ? Math.abs(Math.floor((new Date(task.dueDate).getTime() - new Date(today).getTime()) / (1000 * 60 * 60 * 24))) : 0;
+                  const daysOverdue = isOverdue
+                    ? Math.abs(
+                        Math.floor(
+                          (new Date(task.dueDate).getTime() - new Date(today).getTime()) /
+                            (1000 * 60 * 60 * 24)
+                        )
+                      )
+                    : 0;
                   const isHighlighted = highlightedTaskId?.includes(task.id);
-                  
+
                   return (
                     <div
                       key={task.id}
@@ -578,8 +656,8 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                       className={`rounded-lg p-3 shadow-sm hover:shadow-md transition-all cursor-move ${
                         isHighlighted
                           ? 'ring-4 ring-primary border-2 border-primary bg-primary/20 shadow-lg shadow-primary/50 animate-pulse'
-                          : isOverdue 
-                          ? 'bg-danger/10 border-2 border-danger/50' 
+                          : isOverdue
+                          ? 'bg-danger/10 border-2 border-danger/50'
                           : 'bg-info/5 border-2 border-info/30'
                       }`}
                     >
@@ -595,21 +673,27 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                             <span className="text-xs bg-success/20 text-success px-1.5 py-0.5 rounded whitespace-nowrap">
                               🔄 {task.recurrence}
                             </span>
-                          ) : !isOverdue && (
-                            <span className="text-xs bg-muted/50 text-muted-foreground px-1.5 py-0.5 rounded whitespace-nowrap">
-                              ⏺ puntual
-                            </span>
+                          ) : (
+                            !isOverdue && (
+                              <span className="text-xs bg-muted/50 text-muted-foreground px-1.5 py-0.5 rounded whitespace-nowrap">
+                                ⏺ puntual
+                              </span>
+                            )
                           )}
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{task.description}</p>
+                      <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                        {task.description}
+                      </p>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {(() => {
                           const catConfig = getCategoryConfig(task.category);
                           const catClasses = getCategoryClasses(task.category);
                           const CatIcon = catConfig.icon;
                           return (
-                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${catClasses.badge}`}>
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${catClasses.badge}`}
+                            >
                               <CatIcon className="w-3 h-3" />
                               {task.category}
                             </span>
@@ -623,11 +707,13 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                           const urgencyConfig = {
                             high: { color: 'bg-danger/20 text-danger', label: 'Alta' },
                             medium: { color: 'bg-warning/20 text-warning', label: 'Media' },
-                            low: { color: 'bg-success/20 text-success', label: 'Baja' }
+                            low: { color: 'bg-success/20 text-success', label: 'Baja' },
                           };
                           const config = urgencyConfig[task.urgency];
                           return (
-                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${config.color}`}>
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${config.color}`}
+                            >
                               <AlertCircle className="w-3 h-3" />
                               {config.label}
                             </span>
@@ -635,12 +721,19 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                         })()}
                       </div>
                       <div className="flex items-center justify-between text-xs text-muted-foreground mb-3 pb-3 border-t border-border pt-3">
-                        <span className={`flex items-center gap-1 ${isOverdue ? 'text-danger font-semibold' : ''}`}>
+                        <span
+                          className={`flex items-center gap-1 ${
+                            isOverdue ? 'text-danger font-semibold' : ''
+                          }`}
+                        >
                           <Clock className="w-3 h-3" />
-                          {isOverdue 
-                            ? (daysOverdue === 0 ? 'Vencida hoy' : daysOverdue === 1 ? 'Hace 1 día' : `Hace ${daysOverdue} días`)
-                            : `Vence: ${new Date(task.dueDate).toLocaleDateString('es-ES')}`
-                          }
+                          {isOverdue
+                            ? daysOverdue === 0
+                              ? 'Vencida hoy'
+                              : daysOverdue === 1
+                              ? 'Hace 1 día'
+                              : `Hace ${daysOverdue} días`
+                            : `Vence: ${new Date(task.dueDate).toLocaleDateString('es-ES')}`}
                         </span>
                         <span className="flex items-center gap-1">
                           <User className="w-3 h-3" />
@@ -654,7 +747,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                               setUnassignedTaskDialog({
                                 open: true,
                                 task: task,
-                                intendedAction: 'completar'
+                                intendedAction: 'completar',
                               });
                               return;
                             }
@@ -672,7 +765,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
             </div>
 
             {/* Completed Column */}
-            <div 
+            <div
               className="bg-card rounded-xl p-4 border border-border min-h-100"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop('completed')}
@@ -685,7 +778,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                 </span>
               </div>
               <div className="space-y-3">
-                {completedTasks.map(task => {
+                {completedTasks.map((task) => {
                   const isHighlighted = highlightedTaskId?.includes(task.id);
                   return (
                     <div
@@ -713,14 +806,18 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                           )}
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{task.description}</p>
+                      <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                        {task.description}
+                      </p>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {(() => {
                           const catConfig = getCategoryConfig(task.category);
                           const catClasses = getCategoryClasses(task.category);
                           const CatIcon = catConfig.icon;
                           return (
-                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${catClasses.badge}`}>
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${catClasses.badge}`}
+                            >
                               <CatIcon className="w-3 h-3" />
                               {task.category}
                             </span>
@@ -734,11 +831,13 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                           const urgencyConfig = {
                             high: { color: 'bg-danger/20 text-danger', label: 'Alta' },
                             medium: { color: 'bg-warning/20 text-warning', label: 'Media' },
-                            low: { color: 'bg-success/20 text-success', label: 'Baja' }
+                            low: { color: 'bg-success/20 text-success', label: 'Baja' },
                           };
                           const config = urgencyConfig[task.urgency];
                           return (
-                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${config.color}`}>
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${config.color}`}
+                            >
                               <AlertCircle className="w-3 h-3" />
                               {config.label}
                             </span>
@@ -777,33 +876,46 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                 <thead className="bg-muted border-b border-border">
                   <tr>
                     <th className="text-left p-3 text-sm font-semibold text-foreground">Tarea</th>
-                    <th className="text-left p-3 text-sm font-semibold text-foreground">Categoría</th>
-                    <th className="text-left p-3 text-sm font-semibold text-foreground">Recurrencia</th>
+                    <th className="text-left p-3 text-sm font-semibold text-foreground">
+                      Categoría
+                    </th>
+                    <th className="text-left p-3 text-sm font-semibold text-foreground">
+                      Recurrencia
+                    </th>
                     <th className="text-left p-3 text-sm font-semibold text-foreground">Estado</th>
                     <th className="text-left p-3 text-sm font-semibold text-foreground">Fecha</th>
                     <th className="text-left p-3 text-sm font-semibold text-foreground">Puntos</th>
-                    <th className="text-center p-3 text-sm font-semibold text-foreground">Acciones</th>
+                    <th className="text-center p-3 text-sm font-semibold text-foreground">
+                      Acciones
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {sortedTasks.map(task => {
+                  {sortedTasks.map((task) => {
                     const isOverdue = task.dueDate < today && task.status !== 'completed';
                     const isHighlighted = highlightedTaskId?.includes(task.id);
-                    
+
                     return (
-                      <tr 
+                      <tr
                         key={task.id}
                         data-task-id={task.id}
                         className={`hover:bg-muted/50 transition-colors ${
-                          isHighlighted ? 'ring-4 ring-primary border-2 border-primary bg-primary/20 shadow-lg shadow-primary/50 animate-pulse' :
-                          isOverdue ? 'bg-danger/5' : 
-                          task.status === 'completed' ? 'bg-success/5' : 
-                          task.status === 'in-progress' ? 'bg-info/5' : ''
+                          isHighlighted
+                            ? 'ring-4 ring-primary border-2 border-primary bg-primary/20 shadow-lg shadow-primary/50 animate-pulse'
+                            : isOverdue
+                            ? 'bg-danger/5'
+                            : task.status === 'completed'
+                            ? 'bg-success/5'
+                            : task.status === 'in-progress'
+                            ? 'bg-info/5'
+                            : ''
                         }`}
                       >
                         <td className="p-3">
                           <div className="font-medium text-foreground">{task.title}</div>
-                          <div className="text-xs text-muted-foreground line-clamp-1">{task.description}</div>
+                          <div className="text-xs text-muted-foreground line-clamp-1">
+                            {task.description}
+                          </div>
                         </td>
                         <td className="p-3">
                           {(() => {
@@ -811,7 +923,9 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                             const catClasses = getCategoryClasses(task.category);
                             const CatIcon = catConfig.icon;
                             return (
-                              <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${catClasses.badge}`}>
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${catClasses.badge}`}
+                              >
                                 <CatIcon className="w-3 h-3" />
                                 {task.category}
                               </span>
@@ -830,16 +944,28 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                           )}
                         </td>
                         <td className="p-3">
-                          <span className={`inline-flex items-center px-2 py-1 rounded text-xs ${
-                            task.status === 'pending' ? 'bg-warning/10 text-warning border border-warning/20' :
-                            task.status === 'in-progress' ? 'bg-info/10 text-info border border-info/20' :
-                            'bg-success/10 text-success border border-success/20'
-                          }`}>
-                            {task.status === 'pending' ? 'Pendiente' : task.status === 'in-progress' ? 'En progreso' : 'Completada'}
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded text-xs ${
+                              task.status === 'pending'
+                                ? 'bg-warning/10 text-warning border border-warning/20'
+                                : task.status === 'in-progress'
+                                ? 'bg-info/10 text-info border border-info/20'
+                                : 'bg-success/10 text-success border border-success/20'
+                            }`}
+                          >
+                            {task.status === 'pending'
+                              ? 'Pendiente'
+                              : task.status === 'in-progress'
+                              ? 'En progreso'
+                              : 'Completada'}
                           </span>
                         </td>
                         <td className="p-3">
-                          <span className={`text-xs ${isOverdue ? 'text-danger font-semibold' : 'text-muted-foreground'}`}>
+                          <span
+                            className={`text-xs ${
+                              isOverdue ? 'text-danger font-semibold' : 'text-muted-foreground'
+                            }`}
+                          >
                             {new Date(task.dueDate).toLocaleDateString('es-ES')}
                           </span>
                         </td>
@@ -858,7 +984,7 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                                     setUnassignedTaskDialog({
                                       open: true,
                                       task: task,
-                                      intendedAction: 'completar'
+                                      intendedAction: 'completar',
                                     });
                                     return;
                                   }
@@ -916,7 +1042,9 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                 </p>
               </div>
               <button
-                onClick={() => setUnassignedTaskDialog({ open: false, task: null, intendedAction: '' })}
+                onClick={() =>
+                  setUnassignedTaskDialog({ open: false, task: null, intendedAction: '' })
+                }
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 title="Cerrar diálogo"
               >
@@ -928,20 +1056,23 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
             <div className="bg-muted/50 rounded-lg p-3 mb-4">
               <p className="font-medium text-foreground mb-1">{unassignedTaskDialog.task.title}</p>
               {unassignedTaskDialog.task.description && (
-                <p className="text-xs text-muted-foreground line-clamp-2">{unassignedTaskDialog.task.description}</p>
+                <p className="text-xs text-muted-foreground line-clamp-2">
+                  {unassignedTaskDialog.task.description}
+                </p>
               )}
             </div>
 
             {/* Message */}
             <p className="text-sm text-muted-foreground mb-4">
-              Para poder {unassignedTaskDialog.intendedAction} esta tarea, primero debes asignarla a un miembro del equipo.
+              Para poder {unassignedTaskDialog.intendedAction} esta tarea, primero debes asignarla a
+              un miembro del equipo.
             </p>
 
             {/* Actions */}
             <div className="space-y-2">
               <p className="text-xs font-medium text-foreground mb-2">Asignar a:</p>
               <div className="grid grid-cols-2 gap-2">
-                {members.map(member => (
+                {members.map((member) => (
                   <button
                     key={member.id}
                     onClick={() => {
@@ -956,7 +1087,9 @@ export function MyTasks({ tasks, members, onUpdateTask, onDeleteTask, onEditTask
                 ))}
               </div>
               <button
-                onClick={() => setUnassignedTaskDialog({ open: false, task: null, intendedAction: '' })}
+                onClick={() =>
+                  setUnassignedTaskDialog({ open: false, task: null, intendedAction: '' })
+                }
                 className="w-full mt-4 px-4 py-2 rounded-lg border border-border text-muted-foreground hover:bg-muted transition-colors"
               >
                 Cancelar

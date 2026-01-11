@@ -2,25 +2,25 @@
  * ============================================================================
  * APP.TSX - COMPONENTE PRINCIPAL DE LA APLICACIÓN HOMELY
  * ============================================================================
- * 
+ *
  * Este es el componente raíz que gestiona:
  * - Estado global (miembros, tareas, recompensas, notificaciones)
  * - Navegación entre secciones (sidebar)
  * - Tema claro/oscuro
  * - Persistencia en localStorage
- * 
+ *
  * ESTRUCTURA DE COLORES:
  * Los colores se definen en globals.css usando variables CSS.
  * Para cambiar un color, busca la variable correspondiente:
  * - --primary: Verde principal (#28AC71)
- * - --accent: Coral de acento (#E76F51)  
+ * - --accent: Coral de acento (#E76F51)
  * - --secondary: Gris secundario (#605669)
- * 
+ *
  * CÓMO AÑADIR NUEVAS SECCIONES:
  * 1. Importa el nuevo componente
  * 2. Añade entrada en menuItems con icono de lucide-react
  * 3. Añade case en el switch de renderContent()
- * 
+ *
  * @author Equipo Homely
  * @version 1.0.0
  */
@@ -37,7 +37,22 @@ import { Settings } from './components/Settings';
 import { NotificationBell } from './components/NotificationBell';
 import { UserAvatar } from './components/UserAvatar';
 import { Logo } from './components/Logo';
-import { Home, ListTodo, BarChart3, Users, Moon, Sun, User, Menu, X, Bell, Settings as SettingsIcon, ClipboardCheck, Gift, Award } from 'lucide-react';
+import {
+  Home,
+  ListTodo,
+  BarChart3,
+  Users,
+  Moon,
+  Sun,
+  User,
+  Menu,
+  X,
+  Bell,
+  Settings as SettingsIcon,
+  ClipboardCheck,
+  Gift,
+  Award,
+} from 'lucide-react';
 
 export type Member = {
   id: string;
@@ -139,7 +154,19 @@ export type RewardRedemption = {
 
 export type Notification = {
   id: string;
-  type: 'overdue' | 'due_today' | 'due_tomorrow' | 'task_assigned' | 'task_completed' | 'badge_earned' | 'level_up' | 'streak' | 'leader' | 'reward_available' | 'reward_redeemed' | 'system';
+  type:
+    | 'overdue'
+    | 'due_today'
+    | 'due_tomorrow'
+    | 'task_assigned'
+    | 'task_completed'
+    | 'badge_earned'
+    | 'level_up'
+    | 'streak'
+    | 'leader'
+    | 'reward_available'
+    | 'reward_redeemed'
+    | 'system';
   message: string;
   date: string;
   read: boolean;
@@ -156,18 +183,29 @@ export type HomeConfig = {
 };
 
 function App() {
-    // Registrar actividad cuando se ejecuta una rutina desde TaskList
-    useEffect(() => {
-      const handleRoutineExecuted = (e: CustomEvent) => {
-        const { memberId, message, data } = e.detail;
-        addActivity('routine_executed', memberId, message, data);
-      };
-      window.addEventListener('routine_executed', handleRoutineExecuted as EventListener);
-      return () => {
-        window.removeEventListener('routine_executed', handleRoutineExecuted as EventListener);
-      };
-    }, []);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'mytasks' | 'tasks' | 'stats' | 'members' | 'rewards' | 'achievements' | 'notifications' | 'profile' | 'settings'>('dashboard');
+  // Registrar actividad cuando se ejecuta una rutina desde TaskList
+  useEffect(() => {
+    const handleRoutineExecuted = (e: CustomEvent) => {
+      const { memberId, message, data } = e.detail;
+      addActivity('routine_executed', memberId, message, data);
+    };
+    window.addEventListener('routine_executed', handleRoutineExecuted as EventListener);
+    return () => {
+      window.removeEventListener('routine_executed', handleRoutineExecuted as EventListener);
+    };
+  }, []);
+  const [activeTab, setActiveTab] = useState<
+    | 'dashboard'
+    | 'mytasks'
+    | 'tasks'
+    | 'stats'
+    | 'members'
+    | 'rewards'
+    | 'achievements'
+    | 'notifications'
+    | 'profile'
+    | 'settings'
+  >('dashboard');
   const [members, setMembers] = useState<Member[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
@@ -176,7 +214,10 @@ function App() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [customRoutines, setCustomRoutines] = useState<TaskTemplate[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [homeConfig, setHomeConfig] = useState<HomeConfig>({ name: 'Mi Hogar', welcomeMessage: 'Bienvenido a Casa García 👋' });
+  const [homeConfig, setHomeConfig] = useState<HomeConfig>({
+    name: 'Mi Hogar',
+    welcomeMessage: 'Bienvenido a Casa García 👋',
+  });
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openTaskCreateForm, setOpenTaskCreateForm] = useState(false);
@@ -184,6 +225,7 @@ function App() {
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [highlightedTaskIds, setHighlightedTaskIds] = useState<string[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Initialize dark mode from localStorage
   useEffect(() => {
@@ -196,6 +238,34 @@ function App() {
       }
     }
   }, []);
+
+  // Initialize currentUserId from localStorage (ejecutar solo una vez después de cargar members)
+  useEffect(() => {
+    if (members.length === 0 || isInitialized) return; // Esperar a que members se cargue y no repetir
+
+    const storedUserId = localStorage.getItem('homely_currentUserId');
+    if (storedUserId && storedUserId !== '') {
+      // Validar que el usuario existe
+      const userExists = members.some((m) => m.id === storedUserId);
+      if (userExists) {
+        setCurrentUserId(storedUserId);
+      } else {
+        // Usuario no existe, usar el primero disponible
+        setCurrentUserId(members[0]?.id || null);
+      }
+    } else {
+      // No hay usuario guardado, usar el primero
+      setCurrentUserId(members[0]?.id || null);
+    }
+    setIsInitialized(true);
+  }, [members, isInitialized]);
+
+  // Persist currentUserId to localStorage
+  useEffect(() => {
+    if (currentUserId && isInitialized) {
+      localStorage.setItem('homely_currentUserId', currentUserId);
+    }
+  }, [currentUserId, isInitialized]);
 
   // Reset form cuando cambias de tab
   useEffect(() => {
@@ -213,15 +283,17 @@ function App() {
   useEffect(() => {
     const processedTasksKey = 'homely_processed_recurrent_tasks';
     const storedProcessed = localStorage.getItem(processedTasksKey);
-    const permanentProcessedTasks = new Set<string>(storedProcessed ? JSON.parse(storedProcessed) : []);
+    const permanentProcessedTasks = new Set<string>(
+      storedProcessed ? JSON.parse(storedProcessed) : []
+    );
 
-    tasks.forEach(task => {
+    tasks.forEach((task) => {
       // Condiciones para crear la siguiente tarea recurrente:
       const shouldCreateNext =
-        task.status === 'completed' &&           // Tarea completada
-        task.recurrence &&                        // Tiene recurrencia definida
-        task.recurrence !== 'puntual' &&          // No es puntual (una vez)
-        !permanentProcessedTasks.has(task.id);    // No la hemos procesado nunca
+        task.status === 'completed' && // Tarea completada
+        task.recurrence && // Tiene recurrencia definida
+        task.recurrence !== 'puntual' && // No es puntual (una vez)
+        !permanentProcessedTasks.has(task.id); // No la hemos procesado nunca
 
       if (!shouldCreateNext) {
         return;
@@ -242,12 +314,13 @@ function App() {
       }
 
       // Verificar que no exista ya una tarea futura idéntica
-      const duplicateExists = tasks.some(t =>
-        t.title === task.title &&
-        t.dueDate === nextDueDate &&
-        t.status !== 'completed' &&
-        t.recurrence === task.recurrence &&
-        t.id !== task.id  // No contar la tarea actual
+      const duplicateExists = tasks.some(
+        (t) =>
+          t.title === task.title &&
+          t.dueDate === nextDueDate &&
+          t.status !== 'completed' &&
+          t.recurrence === task.recurrence &&
+          t.id !== task.id // No contar la tarea actual
       );
 
       if (duplicateExists) {
@@ -258,7 +331,7 @@ function App() {
       addTask({
         title: task.title,
         description: task.description,
-        assignedTo: '',  // Sin asignar para rotación equitativa
+        assignedTo: '', // Sin asignar para rotación equitativa
         dueDate: nextDueDate,
         status: 'pending',
         points: task.points,
@@ -299,7 +372,7 @@ function App() {
       const parsedMembers = JSON.parse(storedMembers);
       const migratedMembers = parsedMembers.map((member: Member) => {
         const badges = member.badges || [];
-        
+
         // Asignar badges por puntos si no los tiene
         if (member.points >= 100 && !badges.includes('points_100')) {
           badges.push('points_100');
@@ -310,12 +383,12 @@ function App() {
         if (member.points >= 1000 && !badges.includes('points_1000')) {
           badges.push('points_1000');
         }
-        
+
         // Asignar first_task si tiene puntos (significa que completó tareas)
         if (member.points > 0 && !badges.includes('first_task')) {
           badges.push('first_task');
         }
-        
+
         return { ...member, badges };
       });
       setMembers(migratedMembers);
@@ -323,10 +396,54 @@ function App() {
     } else {
       // Default members
       const defaultMembers: Member[] = [
-        { id: '1', name: 'Ana', avatar: '👩', points: 120, color: '#28AC71', monthlyPoints: 0, lastMonthReset: new Date().toISOString().split('T')[0], level: 1, experience: 120, badges: ['first_task', 'points_100'] },
-        { id: '2', name: 'Carlos', avatar: '👨', points: 95, color: '#29541F', monthlyPoints: 0, lastMonthReset: new Date().toISOString().split('T')[0], level: 1, experience: 95, badges: ['first_task'] },
-        { id: '3', name: 'María', avatar: '👧', points: 80, color: '#E76F51', monthlyPoints: 0, lastMonthReset: new Date().toISOString().split('T')[0], level: 1, experience: 80, badges: ['first_task'] },
-        { id: '4', name: 'Pedro', avatar: '👦', points: 65, color: '#605669', monthlyPoints: 0, lastMonthReset: new Date().toISOString().split('T')[0], level: 1, experience: 65, badges: ['first_task'] },
+        {
+          id: '1',
+          name: 'Ana',
+          avatar: '👩',
+          points: 120,
+          color: '#28AC71',
+          monthlyPoints: 0,
+          lastMonthReset: new Date().toISOString().split('T')[0],
+          level: 1,
+          experience: 120,
+          badges: ['first_task', 'points_100'],
+        },
+        {
+          id: '2',
+          name: 'Carlos',
+          avatar: '👨',
+          points: 95,
+          color: '#29541F',
+          monthlyPoints: 0,
+          lastMonthReset: new Date().toISOString().split('T')[0],
+          level: 1,
+          experience: 95,
+          badges: ['first_task'],
+        },
+        {
+          id: '3',
+          name: 'María',
+          avatar: '👧',
+          points: 80,
+          color: '#E76F51',
+          monthlyPoints: 0,
+          lastMonthReset: new Date().toISOString().split('T')[0],
+          level: 1,
+          experience: 80,
+          badges: ['first_task'],
+        },
+        {
+          id: '4',
+          name: 'Pedro',
+          avatar: '👦',
+          points: 65,
+          color: '#605669',
+          monthlyPoints: 0,
+          lastMonthReset: new Date().toISOString().split('T')[0],
+          level: 1,
+          experience: 65,
+          badges: ['first_task'],
+        },
       ];
       setMembers(defaultMembers);
       localStorage.setItem('homely_members', JSON.stringify(defaultMembers));
@@ -337,7 +454,7 @@ function App() {
       // Migrar tareas antiguas que no tienen el campo recurrence
       const migratedTasks = parsedTasks.map((task: Task) => ({
         ...task,
-        recurrence: task.recurrence || 'puntual' // Si no tiene recurrence, asignar 'puntual'
+        recurrence: task.recurrence || 'puntual', // Si no tiene recurrence, asignar 'puntual'
       }));
       setTasks(migratedTasks);
       localStorage.setItem('homely_tasks', JSON.stringify(migratedTasks));
@@ -498,7 +615,7 @@ function App() {
       setHomeConfig(defaultHomeConfig);
       localStorage.setItem('homely_home_config', JSON.stringify(defaultHomeConfig));
     }
-    
+
     // Marcar que los datos han sido cargados
     setIsDataLoaded(true);
   }, []);
@@ -551,7 +668,12 @@ function App() {
   }, [homeConfig]);
 
   // ==================== FUNCIÓN PARA REGISTRAR ACTIVIDADES ====================
-  const addActivity = (type: Activity['type'], memberId: string, message: string, data?: Record<string, unknown>) => {
+  const addActivity = (
+    type: Activity['type'],
+    memberId: string,
+    message: string,
+    data?: Record<string, unknown>
+  ) => {
     const newActivity: Activity = {
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type,
@@ -560,7 +682,7 @@ function App() {
       timestamp: new Date().toISOString(),
       data,
     };
-    setActivities(prev => [...prev, newActivity]);
+    setActivities((prev) => [...prev, newActivity]);
   };
 
   // ==================== FUNCIÓN PARA CREAR NOTIFICACIONES ====================
@@ -583,7 +705,7 @@ function App() {
       read: false,
       ...options,
     };
-    setNotifications(prev => [newNotification, ...prev]);
+    setNotifications((prev) => [newNotification, ...prev]);
   };
 
   // ==================== DETECTOR DE NOTIFICACIONES AUTOMÁTICAS ====================
@@ -592,19 +714,19 @@ function App() {
 
     const today = new Date().toISOString().split('T')[0];
     const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    
+
     // IDs de notificaciones ya enviadas (persistente en localStorage para evitar duplicados)
     const storedSentIds = localStorage.getItem('sentNotificationIds');
     const allSentIds = storedSentIds ? JSON.parse(storedSentIds) : [];
 
     // Limpiar IDs de días anteriores (mantener solo de hoy)
     const todaySentIds = allSentIds.filter((id: string) => id.startsWith(today));
-    
+
     // Si encontramos IDs de días anteriores, actualizar localStorage
     if (allSentIds.length !== todaySentIds.length) {
       localStorage.setItem('sentNotificationIds', JSON.stringify(todaySentIds));
     }
-    
+
     const saveSentNotificationId = (id: string) => {
       const fullId = `${today}-${id}`;
       if (!todaySentIds.includes(fullId)) {
@@ -614,75 +736,73 @@ function App() {
     };
 
     // 1. Tareas atrasadas
-    const overdueTasks = tasks.filter(t => 
-      t.dueDate < today && 
-      t.status !== 'completed' &&
-      t.assignedTo === currentUser?.id
+    const overdueTasks = tasks.filter(
+      (t) => t.dueDate < today && t.status !== 'completed' && t.assignedTo === currentUser?.id
     );
-    
-    overdueTasks.forEach(task => {
+
+    overdueTasks.forEach((task) => {
       const notifId = `overdue-${task.id}-${currentUser?.id}`;
       if (!todaySentIds.includes(`${today}-${notifId}`)) {
         addNotification('overdue', `⚠️ La tarea "${task.title}" está atrasada`, {
           taskId: task.id,
           memberId: currentUser?.id,
-          actionUrl: 'mytasks'
+          actionUrl: 'mytasks',
         });
         saveSentNotificationId(notifId);
       }
     });
 
     // 2. Tareas que vencen hoy
-    const dueTodayTasks = tasks.filter(t => 
-      t.dueDate === today && 
-      t.status !== 'completed' &&
-      t.assignedTo === currentUser?.id
+    const dueTodayTasks = tasks.filter(
+      (t) => t.dueDate === today && t.status !== 'completed' && t.assignedTo === currentUser?.id
     );
-    
-    dueTodayTasks.forEach(task => {
+
+    dueTodayTasks.forEach((task) => {
       const notifId = `due_today-${task.id}-${currentUser?.id}`;
       if (!todaySentIds.includes(`${today}-${notifId}`)) {
         addNotification('due_today', `📅 La tarea "${task.title}" vence hoy`, {
           taskId: task.id,
           memberId: currentUser?.id,
-          actionUrl: 'mytasks'
+          actionUrl: 'mytasks',
         });
         saveSentNotificationId(notifId);
       }
     });
 
     // 3. Tareas que vencen mañana
-    const dueTomorrowTasks = tasks.filter(t => 
-      t.dueDate === tomorrow && 
-      t.status !== 'completed' &&
-      t.assignedTo === currentUser?.id
+    const dueTomorrowTasks = tasks.filter(
+      (t) => t.dueDate === tomorrow && t.status !== 'completed' && t.assignedTo === currentUser?.id
     );
-    
-    dueTomorrowTasks.forEach(task => {
+
+    dueTomorrowTasks.forEach((task) => {
       const notifId = `due_tomorrow-${task.id}-${currentUser?.id}`;
       if (!todaySentIds.includes(`${today}-${notifId}`)) {
         addNotification('due_tomorrow', `🔔 La tarea "${task.title}" vence mañana`, {
           taskId: task.id,
           memberId: currentUser?.id,
-          actionUrl: 'mytasks'
+          actionUrl: 'mytasks',
         });
         saveSentNotificationId(notifId);
       }
     });
 
     // 4. Resumen diario (si hay tareas pendientes para hoy)
-    const pendingTodayCount = tasks.filter(t => 
-      t.dueDate <= today && 
-      t.status !== 'completed' &&
-      t.assignedTo === currentUser?.id
+    const pendingTodayCount = tasks.filter(
+      (t) => t.dueDate <= today && t.status !== 'completed' && t.assignedTo === currentUser?.id
     ).length;
-    
+
     const dailySummaryId = `system-daily`;
     if (pendingTodayCount > 0 && !todaySentIds.includes(`${today}-${dailySummaryId}`)) {
-      addNotification('system', `📋 Tienes ${pendingTodayCount} tarea${pendingTodayCount > 1 ? 's' : ''} pendiente${pendingTodayCount > 1 ? 's' : ''} para hoy`, {
-        memberId: currentUser?.id,
-        actionUrl: 'mytasks'
-      });
+      addNotification(
+        'system',
+        `📋 Tienes ${pendingTodayCount} tarea${pendingTodayCount > 1 ? 's' : ''} pendiente${
+          pendingTodayCount > 1 ? 's' : ''
+        } para hoy`,
+        {
+          memberId: currentUser?.id,
+          actionUrl: 'mytasks',
+        }
+      );
       saveSentNotificationId(dailySummaryId);
     }
   }, [isDataLoaded, tasks, members]); // Re-evaluar cuando cambian las tareas o los miembros
@@ -702,13 +822,22 @@ function App() {
   };
 
   const updateMember = (id: string, updates: Partial<Member>) => {
-    setMembers(prevMembers => prevMembers.map((m: Member) => m.id === id ? { ...m, ...updates } : m));
+    setMembers((prevMembers) =>
+      prevMembers.map((m: Member) => (m.id === id ? { ...m, ...updates } : m))
+    );
   };
 
   const deleteMember = (id: string) => {
-    setMembers(prevMembers => prevMembers.filter((m: Member) => m.id !== id));
+    setMembers((prevMembers) => prevMembers.filter((m: Member) => m.id !== id));
     // Unassign tasks from deleted member
-    setTasks(prevTasks => prevTasks.map((t: Task) => t.assignedTo === id ? { ...t, assignedTo: '' } : t));
+    setTasks((prevTasks) =>
+      prevTasks.map((t: Task) => (t.assignedTo === id ? { ...t, assignedTo: '' } : t))
+    );
+    // Si el usuario eliminado es el usuario actual, cambiar al primero disponible
+    if (currentUserId === id) {
+      const remainingMembers = members.filter((m) => m.id !== id);
+      setCurrentUserId(remainingMembers[0]?.id || null);
+    }
   };
 
   const addTask = (task: Omit<Task, 'id' | 'createdAt'>) => {
@@ -718,10 +847,10 @@ function App() {
       createdAt: new Date().toISOString(),
       comments: [],
     };
-    setTasks(prevTasks => [...prevTasks, newTask]);
+    setTasks((prevTasks) => [...prevTasks, newTask]);
     // Registrar actividad de tarea creada (siempre, aunque no esté asignada)
     const creator = currentUser ? currentUser.name : 'Usuario';
-    const assignedMember = task.assignedTo ? members.find(m => m.id === task.assignedTo) : null;
+    const assignedMember = task.assignedTo ? members.find((m) => m.id === task.assignedTo) : null;
     const asignacion = assignedMember ? `Asignada a ${assignedMember.name}` : 'Sin asignar';
     const fechaFin = task.dueDate ? `Fecha límite: ${task.dueDate}` : '';
     const recurrencia = task.recurrence ? `Recurrencia: ${task.recurrence}` : '';
@@ -739,7 +868,7 @@ function App() {
         assignedTo: assignedMember ? assignedMember.name : null,
         dueDate: task.dueDate,
         recurrence: task.recurrence,
-        points: task.points
+        points: task.points,
       }
     );
 
@@ -748,7 +877,7 @@ function App() {
       addNotification('task_assigned', `📝 Se te asignó la tarea "${task.title}"`, {
         memberId: assignedMember.id,
         taskId: newTask.id,
-        actionUrl: 'mytasks'
+        actionUrl: 'mytasks',
       });
     }
   };
@@ -758,7 +887,7 @@ function App() {
    * IMPORTANTE: La nueva fecha se calcula desde la fecha original de vencimiento,
    * NO desde la fecha actual. Esto asegura que las tareas mantengan su programación
    * incluso si se completan antes de tiempo.
-   * 
+   *
    * Ejemplos:
    * - DIARIA: Tarea del día 8 → Siguiente día 9 (no importa si se completó el día 7)
    * - SEMANAL: Tarea del lunes 8 → Siguiente lunes 15 (7 días después)
@@ -800,11 +929,11 @@ function App() {
         const nextDate = new Date(baseDate);
         const targetDayOfMonth = baseDate.getDate();
         nextDate.setMonth(nextDate.getMonth() + 1);
-        
+
         // Ajustar el día por si el mes tiene menos días (ej: 31 en febrero)
         const daysInMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate();
         nextDate.setDate(Math.min(targetDayOfMonth, daysInMonth));
-        
+
         return formatDateToLocal(nextDate);
       }
 
@@ -815,7 +944,7 @@ function App() {
 
   const updateTask = (id: string, updates: Partial<Task>) => {
     // Buscar la tarea original
-    const taskToUpdate = tasks.find(t => t.id === id);
+    const taskToUpdate = tasks.find((t) => t.id === id);
 
     // Si la tarea pasa a 'completed' y no tenía completedAt, añadir la fecha
     let updatesWithCompletedAt = { ...updates };
@@ -837,36 +966,53 @@ function App() {
       taskToUpdate.status !== 'overdue'
     ) {
       // Registrar actividad de tarea atrasada
-      const assignedMember = taskToUpdate.assignedTo ? members.find(m => m.id === taskToUpdate.assignedTo) : null;
+      const assignedMember = taskToUpdate.assignedTo
+        ? members.find((m) => m.id === taskToUpdate.assignedTo)
+        : null;
       const description = assignedMember
         ? `${assignedMember.name} tiene una tarea atrasada: "${taskToUpdate.title}"`
         : `Una tarea sin asignar está atrasada: "${taskToUpdate.title}"`;
-      
-      addActivity('task_overdue', taskToUpdate.assignedTo,
-        description,
-        { taskId: id, taskTitle: taskToUpdate.title, action: 'overdue' }
-      );
+
+      addActivity('task_overdue', taskToUpdate.assignedTo, description, {
+        taskId: id,
+        taskTitle: taskToUpdate.title,
+        action: 'overdue',
+      });
     }
 
     // Actualizar la tarea
-    setTasks(prevTasks => prevTasks.map((t: Task) => {
-      if (t.id === id) {
-        return { ...t, ...updatesWithCompletedAt };
-      }
-      return t;
-    }));
+    setTasks((prevTasks) =>
+      prevTasks.map((t: Task) => {
+        if (t.id === id) {
+          return { ...t, ...updatesWithCompletedAt };
+        }
+        return t;
+      })
+    );
 
     // Luego, si se completó la tarea, actualizar el miembro (fuera del setState para evitar closures)
-    if (taskToUpdate && taskToUpdate.status !== 'completed' && updates.status === 'completed' && taskToUpdate.assignedTo) {
+    if (
+      taskToUpdate &&
+      taskToUpdate.status !== 'completed' &&
+      updates.status === 'completed' &&
+      taskToUpdate.assignedTo
+    ) {
       const member = members.find((m: Member) => m.id === taskToUpdate.assignedTo);
-      
+
       // Registrar actividad de tarea completada
-      addActivity('task_completed', taskToUpdate.assignedTo,
+      addActivity(
+        'task_completed',
+        taskToUpdate.assignedTo,
         `${member?.name || 'Usuario'} completó la tarea "${taskToUpdate.title}"`,
-        { taskId: id, taskTitle: taskToUpdate.title, points: taskToUpdate.points, action: 'completed' }
+        {
+          taskId: id,
+          taskTitle: taskToUpdate.title,
+          points: taskToUpdate.points,
+          action: 'completed',
+        }
       );
-      
-      setMembers(prevMembers => {
+
+      setMembers((prevMembers) => {
         const memberToUpdate = prevMembers.find((m: Member) => m.id === taskToUpdate.assignedTo);
         if (memberToUpdate) {
           // Sistema de XP: 1 tarea = 10 XP
@@ -878,12 +1024,14 @@ function App() {
           const leveledUp = newLevel > memberToUpdate.level;
 
           // Contar tareas completadas por este miembro
-          const completedTasksCount = tasks.filter(t => t.assignedTo === memberToUpdate.id && t.status === 'completed').length + 1;
+          const completedTasksCount =
+            tasks.filter((t) => t.assignedTo === memberToUpdate.id && t.status === 'completed')
+              .length + 1;
           const newPoints = memberToUpdate.points + taskToUpdate.points;
 
           // Verificar badges ganados
           const newBadges = [...memberToUpdate.badges];
-          
+
           // Badge por nivel (cada 10 niveles)
           if (leveledUp && newLevel % 10 === 0) {
             const levelBadgeId = `level_${newLevel}`;
@@ -896,15 +1044,27 @@ function App() {
           if (completedTasksCount === 1 && !newBadges.includes('first_task')) {
             newBadges.push('first_task');
           }
-          
+
           // Badges por cantidad de tareas (usar >= para no saltar badges)
-          if (completedTasksCount >= 10 && !memberToUpdate.badges.includes('tasks_10') && !newBadges.includes('tasks_10')) {
+          if (
+            completedTasksCount >= 10 &&
+            !memberToUpdate.badges.includes('tasks_10') &&
+            !newBadges.includes('tasks_10')
+          ) {
             newBadges.push('tasks_10');
           }
-          if (completedTasksCount >= 50 && !memberToUpdate.badges.includes('tasks_50') && !newBadges.includes('tasks_50')) {
+          if (
+            completedTasksCount >= 50 &&
+            !memberToUpdate.badges.includes('tasks_50') &&
+            !newBadges.includes('tasks_50')
+          ) {
             newBadges.push('tasks_50');
           }
-          if (completedTasksCount >= 200 && !memberToUpdate.badges.includes('tasks_200') && !newBadges.includes('tasks_200')) {
+          if (
+            completedTasksCount >= 200 &&
+            !memberToUpdate.badges.includes('tasks_200') &&
+            !newBadges.includes('tasks_200')
+          ) {
             newBadges.push('tasks_200');
           }
 
@@ -918,62 +1078,86 @@ function App() {
           if (newPoints >= 1000 && !newBadges.includes('points_1000')) {
             newBadges.push('points_1000');
           }
-          
+
           // Registrar actividad de subida de nivel
           if (leveledUp) {
-            addActivity('level_up', taskToUpdate.assignedTo,
+            addActivity(
+              'level_up',
+              taskToUpdate.assignedTo,
               `${memberToUpdate.name} subió al nivel ${newLevel}! 🎉`,
               { oldLevel: memberToUpdate.level, newLevel }
             );
             // Notificación de subida de nivel
             addNotification('level_up', `🎉 ¡${memberToUpdate.name} subió al nivel ${newLevel}!`, {
               memberId: taskToUpdate.assignedTo,
-              actionUrl: 'achievements'
+              actionUrl: 'achievements',
             });
           }
-          
+
           // Registrar actividad de badge ganado
           if (leveledUp && newLevel % 10 === 0) {
-            addActivity('badge_earned', taskToUpdate.assignedTo,
+            addActivity(
+              'badge_earned',
+              taskToUpdate.assignedTo,
               `${memberToUpdate.name} ganó el badge de Nivel ${newLevel}! 🏆`,
               { badgeId: `level_${newLevel}`, badgeName: `Nivel ${newLevel}` }
             );
             // Notificación de badge ganado
-            addNotification('badge_earned', `🏆 ¡${memberToUpdate.name} desbloqueó el logro "Nivel ${newLevel}"!`, {
-              memberId: taskToUpdate.assignedTo,
-              badgeId: `level_${newLevel}`,
-              actionUrl: 'achievements'
-            });
+            addNotification(
+              'badge_earned',
+              `🏆 ¡${memberToUpdate.name} desbloqueó el logro "Nivel ${newLevel}"!`,
+              {
+                memberId: taskToUpdate.assignedTo,
+                badgeId: `level_${newLevel}`,
+                actionUrl: 'achievements',
+              }
+            );
           }
 
           // Notificaciones de badges por tareas
           if (completedTasksCount === 1 && !memberToUpdate.badges.includes('first_task')) {
-            addNotification('badge_earned', `🏆 ¡${memberToUpdate.name} desbloqueó "Primera Tarea"!`, {
-              memberId: taskToUpdate.assignedTo,
-              badgeId: 'first_task',
-              actionUrl: 'achievements'
-            });
+            addNotification(
+              'badge_earned',
+              `🏆 ¡${memberToUpdate.name} desbloqueó "Primera Tarea"!`,
+              {
+                memberId: taskToUpdate.assignedTo,
+                badgeId: 'first_task',
+                actionUrl: 'achievements',
+              }
+            );
           }
           if (completedTasksCount === 10 && !memberToUpdate.badges.includes('tasks_10')) {
-            addNotification('badge_earned', `🏆 ¡${memberToUpdate.name} desbloqueó "10 Tareas Completadas"!`, {
-              memberId: taskToUpdate.assignedTo,
-              badgeId: 'tasks_10',
-              actionUrl: 'achievements'
-            });
+            addNotification(
+              'badge_earned',
+              `🏆 ¡${memberToUpdate.name} desbloqueó "10 Tareas Completadas"!`,
+              {
+                memberId: taskToUpdate.assignedTo,
+                badgeId: 'tasks_10',
+                actionUrl: 'achievements',
+              }
+            );
           }
           if (completedTasksCount === 50 && !memberToUpdate.badges.includes('tasks_50')) {
-            addNotification('badge_earned', `🏆 ¡${memberToUpdate.name} desbloqueó "50 Tareas Completadas"!`, {
-              memberId: taskToUpdate.assignedTo,
-              badgeId: 'tasks_50',
-              actionUrl: 'achievements'
-            });
+            addNotification(
+              'badge_earned',
+              `🏆 ¡${memberToUpdate.name} desbloqueó "50 Tareas Completadas"!`,
+              {
+                memberId: taskToUpdate.assignedTo,
+                badgeId: 'tasks_50',
+                actionUrl: 'achievements',
+              }
+            );
           }
           if (completedTasksCount === 200 && !memberToUpdate.badges.includes('tasks_200')) {
-            addNotification('badge_earned', `🏆 ¡${memberToUpdate.name} desbloqueó "200 Tareas Completadas"!`, {
-              memberId: taskToUpdate.assignedTo,
-              badgeId: 'tasks_200',
-              actionUrl: 'achievements'
-            });
+            addNotification(
+              'badge_earned',
+              `🏆 ¡${memberToUpdate.name} desbloqueó "200 Tareas Completadas"!`,
+              {
+                memberId: taskToUpdate.assignedTo,
+                badgeId: 'tasks_200',
+                actionUrl: 'achievements',
+              }
+            );
           }
 
           // Notificaciones de badges por puntos
@@ -981,34 +1165,38 @@ function App() {
             addNotification('badge_earned', `⭐ ¡${memberToUpdate.name} alcanzó 100 puntos!`, {
               memberId: taskToUpdate.assignedTo,
               badgeId: 'points_100',
-              actionUrl: 'achievements'
+              actionUrl: 'achievements',
             });
           }
           if (newPoints >= 500 && memberToUpdate.points < 500) {
             addNotification('badge_earned', `⭐ ¡${memberToUpdate.name} alcanzó 500 puntos!`, {
               memberId: taskToUpdate.assignedTo,
               badgeId: 'points_500',
-              actionUrl: 'achievements'
+              actionUrl: 'achievements',
             });
           }
           if (newPoints >= 1000 && memberToUpdate.points < 1000) {
             addNotification('badge_earned', `⭐ ¡${memberToUpdate.name} alcanzó 1000 puntos!`, {
               memberId: taskToUpdate.assignedTo,
               badgeId: 'points_1000',
-              actionUrl: 'achievements'
+              actionUrl: 'achievements',
             });
           }
 
           // Notificación de tarea completada (para otros miembros)
           if (taskToUpdate.assignedTo !== currentUser?.id) {
-            addNotification('task_completed', `✅ ${memberToUpdate.name} completó "${taskToUpdate.title}"`, {
-              memberId: taskToUpdate.assignedTo,
-              taskId: taskToUpdate.id,
-              actionUrl: 'tasks'
-            });
+            addNotification(
+              'task_completed',
+              `✅ ${memberToUpdate.name} completó "${taskToUpdate.title}"`,
+              {
+                memberId: taskToUpdate.assignedTo,
+                taskId: taskToUpdate.id,
+                actionUrl: 'tasks',
+              }
+            );
           }
-          
-          return prevMembers.map(m =>
+
+          return prevMembers.map((m) =>
             m.id === memberToUpdate.id
               ? {
                   ...m,
@@ -1016,7 +1204,7 @@ function App() {
                   monthlyPoints: m.monthlyPoints + taskToUpdate.points,
                   experience: newExperience,
                   level: newLevel,
-                  badges: newBadges
+                  badges: newBadges,
                 }
               : m
           );
@@ -1027,9 +1215,12 @@ function App() {
   };
 
   const deleteTask = (id: string) => {
-    setTasks(prevTasks => prevTasks.filter((t: Task) => t.id !== id));
+    setTasks((prevTasks) => prevTasks.filter((t: Task) => t.id !== id));
     // Registrar actividad de tarea eliminada
-    addActivity('task_created', currentUser?.id || '', `Se ha eliminado una tarea`, { taskId: id, action: 'deleted' });
+    addActivity('task_created', currentUser?.id || '', `Se ha eliminado una tarea`, {
+      taskId: id,
+      action: 'deleted',
+    });
   };
 
   // Custom Routines CRUD
@@ -1038,21 +1229,34 @@ function App() {
       ...routine,
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     };
-    setCustomRoutines(prev => [...prev, newRoutine]);
+    setCustomRoutines((prev) => [...prev, newRoutine]);
     // Registrar actividad de rutina creada
-    addActivity('routine_executed', currentUser?.id || '', `Se ha creado la rutina "${routine.name}"`, { routineId: newRoutine.id, action: 'created' });
+    addActivity(
+      'routine_executed',
+      currentUser?.id || '',
+      `Se ha creado la rutina "${routine.name}"`,
+      { routineId: newRoutine.id, action: 'created' }
+    );
   };
 
   const updateCustomRoutine = (id: string, updates: Partial<TaskTemplate>) => {
-    setCustomRoutines(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
+    setCustomRoutines((prev) => prev.map((r) => (r.id === id ? { ...r, ...updates } : r)));
     // Registrar actividad de rutina editada
-    addActivity('routine_executed', currentUser?.id || '', `Se ha editado la rutina "${updates.name || ''}"`, { routineId: id, action: 'edited' });
+    addActivity(
+      'routine_executed',
+      currentUser?.id || '',
+      `Se ha editado la rutina "${updates.name || ''}"`,
+      { routineId: id, action: 'edited' }
+    );
   };
 
   const deleteCustomRoutine = (id: string) => {
-    setCustomRoutines(prev => prev.filter(r => r.id !== id));
+    setCustomRoutines((prev) => prev.filter((r) => r.id !== id));
     // Registrar actividad de rutina eliminada
-    addActivity('routine_executed', currentUser?.id || '', `Se ha eliminado una rutina`, { routineId: id, action: 'deleted' });
+    addActivity('routine_executed', currentUser?.id || '', `Se ha eliminado una rutina`, {
+      routineId: id,
+      action: 'deleted',
+    });
   };
 
   const addReward = (reward: Omit<Reward, 'id'>) => {
@@ -1062,26 +1266,34 @@ function App() {
     };
     setRewards([...rewards, newReward]);
     // Registrar actividad de recompensa creada
-    addActivity('reward_redeemed', currentUser?.id || '', `Se ha creado la recompensa "${reward.title}"`, { rewardId: newReward.id, action: 'created' });
+    addActivity(
+      'reward_redeemed',
+      currentUser?.id || '',
+      `Se ha creado la recompensa "${reward.title}"`,
+      { rewardId: newReward.id, action: 'created' }
+    );
   };
 
   const deleteReward = (id: string) => {
     setRewards(rewards.filter((r: Reward) => r.id !== id));
     // Registrar actividad de recompensa eliminada
-    addActivity('reward_redeemed', currentUser?.id || '', `Se ha eliminado una recompensa`, { rewardId: id, action: 'deleted' });
+    addActivity('reward_redeemed', currentUser?.id || '', `Se ha eliminado una recompensa`, {
+      rewardId: id,
+      action: 'deleted',
+    });
   };
 
   const redeemReward = (rewardId: string, memberId: string) => {
     const reward = rewards.find((r: Reward) => r.id === rewardId);
     const member = members.find((m: Member) => m.id === memberId);
-    
+
     if (reward && member && member.points >= reward.pointsCost) {
       // Actualizar puntos del miembro
-      const updatedMembers = members.map(m => 
+      const updatedMembers = members.map((m) =>
         m.id === memberId ? { ...m, points: m.points - reward.pointsCost } : m
       );
       setMembers(updatedMembers);
-      
+
       // Crear registro de canje
       const redemption: RewardRedemption = {
         id: Date.now().toString(),
@@ -1096,40 +1308,51 @@ function App() {
         redeemedAt: new Date().toISOString(),
         status: 'pending',
       };
-      
+
       const updatedRedemptions = [redemption, ...redemptions];
       setRedemptions(updatedRedemptions);
-      
+
       // Guardar inmediatamente en localStorage para evitar pérdida de datos
       localStorage.setItem('homely_members', JSON.stringify(updatedMembers));
       localStorage.setItem('homely_redemptions', JSON.stringify(updatedRedemptions));
-      
+
       // Registrar actividad de canje de recompensa
-      addActivity('reward_redeemed', memberId,
+      addActivity(
+        'reward_redeemed',
+        memberId,
         `${member.name} canjeó "${reward.title}" por ${reward.pointsCost} puntos ${reward.icon}`,
-        { rewardId, rewardTitle: reward.title, pointsCost: reward.pointsCost, rewardIcon: reward.icon }
+        {
+          rewardId,
+          rewardTitle: reward.title,
+          pointsCost: reward.pointsCost,
+          rewardIcon: reward.icon,
+        }
       );
 
       // Notificación de recompensa canjeada (visible para todos los miembros)
-      addNotification('reward_redeemed', `🎁 ${member.name} canjeó "${reward.title}" ${reward.icon}`, {
-        memberId,
-        rewardId,
-        actionUrl: 'rewards'
-      });
-      
+      addNotification(
+        'reward_redeemed',
+        `🎁 ${member.name} canjeó "${reward.title}" ${reward.icon}`,
+        {
+          memberId,
+          rewardId,
+          actionUrl: 'rewards',
+        }
+      );
+
       return true;
     }
     return false;
   };
 
   const updateRedemptionStatus = (redemptionId: string, status: 'pending' | 'used') => {
-    setRedemptions(redemptions.map(r => 
-      r.id === redemptionId ? { ...r, status } : r
-    ));
+    setRedemptions(redemptions.map((r) => (r.id === redemptionId ? { ...r, status } : r)));
   };
 
   const markNotificationAsRead = (id: string) => {
-    setNotifications(notifications.map((n: Notification) => n.id === id ? { ...n, read: true } : n));
+    setNotifications(
+      notifications.map((n: Notification) => (n.id === id ? { ...n, read: true } : n))
+    );
   };
 
   const markAllNotificationsAsRead = () => {
@@ -1153,9 +1376,9 @@ function App() {
   };
 
   const unreadNotifications = notifications.filter((n: Notification) => !n.read).length;
-  
+
   // Usuario actual: usa el ID guardado en estado o el primer miembro por defecto
-  const currentUser = members.find(m => m.id === currentUserId) || members[0];
+  const currentUser = members.find((m) => m.id === currentUserId) || members[0];
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -1173,9 +1396,11 @@ function App() {
       </div>
 
       {/* Left Sidebar */}
-      <aside className={`fixed md:sticky top-0 h-screen w-20 md:w-64 lg:w-72 xl:w-80 bg-card border-r border-border flex flex-col z-40 transition-all duration-300 ease-in-out shadow-2xl md:shadow-none ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-      }`}>
+      <aside
+        className={`fixed md:sticky top-0 h-screen w-20 md:w-64 lg:w-72 xl:w-80 bg-card border-r border-border flex flex-col z-40 transition-all duration-300 ease-in-out shadow-2xl md:shadow-none ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
         {/* Logo - Hidden on mobile, shown on tablet+ */}
         <div className="hidden md:block p-6">
           <Logo className="h-12" />
@@ -1200,7 +1425,7 @@ function App() {
               <Home className="w-5 h-5 shrink-0" />
               <span className="hidden md:inline">Inicio</span>
             </button>
-            
+
             <button
               onClick={() => {
                 setActiveTab('mytasks');
@@ -1301,7 +1526,7 @@ function App() {
           {/* Sección Inferior - Opciones de Usuario */}
           <div className="space-y-2 mt-4">
             <div className="mb-3 border-t border-border"></div>
-            
+
             <button
               onClick={() => {
                 setActiveTab('notifications');
@@ -1359,9 +1584,7 @@ function App() {
 
         {/* Bottom Section - Copyright */}
         <div className="p-4 border-t border-border">
-          <div className="text-xs text-muted-foreground text-center">
-            Homely © 2024
-          </div>
+          <div className="text-xs text-muted-foreground text-center">Homely © 2024</div>
         </div>
       </aside>
 
@@ -1384,11 +1607,11 @@ function App() {
               {/* Iconos de usuario - Derecha */}
               <div className="flex items-center gap-3">
                 <p className="hidden md:block text-sm font-bold text-foreground">
-                  {new Date().toLocaleDateString('es-ES', { 
-                    weekday: 'long', 
+                  {new Date().toLocaleDateString('es-ES', {
+                    weekday: 'long',
                     day: 'numeric',
                     month: 'long',
-                    year: 'numeric'
+                    year: 'numeric',
                   })}
                 </p>
                 <button
@@ -1402,7 +1625,7 @@ function App() {
                     <Moon className="w-5 h-5 text-foreground" />
                   )}
                 </button>
-                <NotificationBell 
+                <NotificationBell
                   unreadCount={unreadNotifications}
                   onClick={() => {
                     setActiveTab('notifications');
@@ -1410,8 +1633,8 @@ function App() {
                   }}
                 />
                 {currentUser && (
-                  <UserAvatar 
-                    member={currentUser} 
+                  <UserAvatar
+                    member={currentUser}
                     onClick={() => {
                       setActiveTab('profile');
                       setIsSidebarOpen(false);
@@ -1424,12 +1647,11 @@ function App() {
         </header>
 
         <div className="max-w-400 mx-auto px-6 lg:px-8 xl:px-12 py-8">
-
           {activeTab === 'dashboard' && (
-            <Dashboard 
-              members={members} 
-              tasks={tasks} 
-              homeConfig={homeConfig} 
+            <Dashboard
+              members={members}
+              tasks={tasks}
+              homeConfig={homeConfig}
               currentUser={currentUser}
               activities={activities}
               onNewTaskClick={() => {
@@ -1440,51 +1662,58 @@ function App() {
                 setActiveTab('tasks');
                 setOpenManageRoutines(true);
               }}
-              onNavigateToTasks={(highlightType: 'overdue' | 'overdue-unassigned' | 'unassigned' | 'pending' | 'in-progress' | 'completed' = 'unassigned') => {
+              onNavigateToTasks={(
+                highlightType:
+                  | 'overdue'
+                  | 'overdue-unassigned'
+                  | 'unassigned'
+                  | 'pending'
+                  | 'in-progress'
+                  | 'completed' = 'unassigned'
+              ) => {
                 setActiveTab('tasks');
                 // Encontrar TODAS las tareas del tipo solicitado
                 const today = new Date().toISOString().split('T')[0];
                 let targetTasks: Task[] = [];
-                
+
                 if (highlightType === 'overdue') {
                   // Todas las tareas atrasadas (con o sin asignar)
-                  targetTasks = tasks.filter(t => 
-                    t.dueDate < today && 
-                    t.status !== 'completed'
-                  );
+                  targetTasks = tasks.filter((t) => t.dueDate < today && t.status !== 'completed');
                 } else if (highlightType === 'overdue-unassigned') {
                   // Solo tareas atrasadas sin asignar
-                  targetTasks = tasks.filter(t => 
-                    (!t.assignedTo || t.assignedTo === '') && 
-                    t.dueDate < today && 
-                    t.status !== 'completed'
+                  targetTasks = tasks.filter(
+                    (t) =>
+                      (!t.assignedTo || t.assignedTo === '') &&
+                      t.dueDate < today &&
+                      t.status !== 'completed'
                   );
                 } else if (highlightType === 'unassigned') {
                   // Tareas sin asignar (incluye atrasadas)
-                  targetTasks = tasks.filter(t => 
-                    (!t.assignedTo || t.assignedTo === '') && 
-                    t.status !== 'completed'
+                  targetTasks = tasks.filter(
+                    (t) => (!t.assignedTo || t.assignedTo === '') && t.status !== 'completed'
                   );
                 } else if (highlightType === 'pending') {
                   // Tareas con status pending
-                  targetTasks = tasks.filter(t => t.status === 'pending');
+                  targetTasks = tasks.filter((t) => t.status === 'pending');
                 } else if (highlightType === 'in-progress') {
                   // Tareas con status in-progress
-                  targetTasks = tasks.filter(t => t.status === 'in-progress');
+                  targetTasks = tasks.filter((t) => t.status === 'in-progress');
                 } else if (highlightType === 'completed') {
                   // Tareas completadas
-                  targetTasks = tasks.filter(t => t.status === 'completed');
+                  targetTasks = tasks.filter((t) => t.status === 'completed');
                 }
-                
+
                 if (targetTasks.length > 0) {
                   setTimeout(() => {
                     // Scroll a la primera tarea
-                    const firstTaskElement = document.querySelector(`[data-task-id="${targetTasks[0].id}"]`);
+                    const firstTaskElement = document.querySelector(
+                      `[data-task-id="${targetTasks[0].id}"]`
+                    );
                     if (firstTaskElement) {
                       firstTaskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
                     // Resaltar TODAS las tareas que cumplen el criterio
-                    setHighlightedTaskIds(targetTasks.map(t => t.id));
+                    setHighlightedTaskIds(targetTasks.map((t) => t.id));
                     // Limpiar el resaltado después de 3 segundos
                     setTimeout(() => setHighlightedTaskIds([]), 3000);
                   }, 100);
@@ -1501,18 +1730,21 @@ function App() {
                 // Resaltar TODAS las tareas atrasadas del usuario
                 setTimeout(() => {
                   const today = new Date().toISOString().split('T')[0];
-                  const overdueTasks = tasks.filter(t => 
-                    t.assignedTo === currentUser?.id && 
-                    t.dueDate < today && 
-                    t.status !== 'completed'
+                  const overdueTasks = tasks.filter(
+                    (t) =>
+                      t.assignedTo === currentUser?.id &&
+                      t.dueDate < today &&
+                      t.status !== 'completed'
                   );
-                  
+
                   if (overdueTasks.length > 0) {
-                    const taskElement = document.querySelector(`[data-task-id="${overdueTasks[0].id}"]`);
+                    const taskElement = document.querySelector(
+                      `[data-task-id="${overdueTasks[0].id}"]`
+                    );
                     if (taskElement) {
                       taskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                    setHighlightedTaskIds(overdueTasks.map(t => t.id));
+                    setHighlightedTaskIds(overdueTasks.map((t) => t.id));
                     setTimeout(() => setHighlightedTaskIds([]), 3000);
                   }
                 }, 100);
@@ -1522,18 +1754,21 @@ function App() {
                 // Resaltar TODAS las tareas de hoy del usuario
                 setTimeout(() => {
                   const today = new Date().toISOString().split('T')[0];
-                  const todayTasks = tasks.filter(t => 
-                    t.assignedTo === currentUser?.id && 
-                    t.dueDate === today && 
-                    t.status !== 'completed'
+                  const todayTasks = tasks.filter(
+                    (t) =>
+                      t.assignedTo === currentUser?.id &&
+                      t.dueDate === today &&
+                      t.status !== 'completed'
                   );
-                  
+
                   if (todayTasks.length > 0) {
-                    const taskElement = document.querySelector(`[data-task-id="${todayTasks[0].id}"]`);
+                    const taskElement = document.querySelector(
+                      `[data-task-id="${todayTasks[0].id}"]`
+                    );
                     if (taskElement) {
                       taskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                    setHighlightedTaskIds(todayTasks.map(t => t.id));
+                    setHighlightedTaskIds(todayTasks.map((t) => t.id));
                     setTimeout(() => setHighlightedTaskIds([]), 3000);
                   }
                 }, 100);
@@ -1542,17 +1777,18 @@ function App() {
                 setActiveTab('mytasks');
                 // Resaltar TODAS las tareas en progreso del usuario
                 setTimeout(() => {
-                  const inProgressTasks = tasks.filter(t => 
-                    t.assignedTo === currentUser?.id && 
-                    t.status === 'in-progress'
+                  const inProgressTasks = tasks.filter(
+                    (t) => t.assignedTo === currentUser?.id && t.status === 'in-progress'
                   );
-                  
+
                   if (inProgressTasks.length > 0) {
-                    const taskElement = document.querySelector(`[data-task-id="${inProgressTasks[0].id}"]`);
+                    const taskElement = document.querySelector(
+                      `[data-task-id="${inProgressTasks[0].id}"]`
+                    );
                     if (taskElement) {
                       taskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                    setHighlightedTaskIds(inProgressTasks.map(t => t.id));
+                    setHighlightedTaskIds(inProgressTasks.map((t) => t.id));
                     setTimeout(() => setHighlightedTaskIds([]), 3000);
                   }
                 }, 100);
@@ -1561,23 +1797,24 @@ function App() {
                 setActiveTab('mytasks');
                 // Resaltar TODAS las tareas completadas del usuario
                 setTimeout(() => {
-                  const completedTasks = tasks.filter(t => 
-                    t.assignedTo === currentUser?.id && 
-                    t.status === 'completed'
+                  const completedTasks = tasks.filter(
+                    (t) => t.assignedTo === currentUser?.id && t.status === 'completed'
                   );
-                  
+
                   if (completedTasks.length > 0) {
-                    const taskElement = document.querySelector(`[data-task-id="${completedTasks[0].id}"]`);
+                    const taskElement = document.querySelector(
+                      `[data-task-id="${completedTasks[0].id}"]`
+                    );
                     if (taskElement) {
                       taskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                    setHighlightedTaskIds(completedTasks.map(t => t.id));
+                    setHighlightedTaskIds(completedTasks.map((t) => t.id));
                     setTimeout(() => setHighlightedTaskIds([]), 3000);
                   }
                 }, 100);
               }}
               onTaskClick={(taskId) => {
-                const task = tasks.find(t => t.id === taskId);
+                const task = tasks.find((t) => t.id === taskId);
                 setHighlightedTaskIds([taskId]);
                 if (task && currentUser && task.assignedTo === currentUser.id) {
                   setActiveTab('mytasks');
@@ -1600,71 +1837,83 @@ function App() {
               }}
               highlightedTaskId={highlightedTaskIds}
               onClearHighlight={() => setHighlightedTaskIds([])}
+              currentUserId={currentUserId}
+              onChangeUser={(userId) => setCurrentUserId(userId)}
               onScrollToMyOverdue={() => {
                 // Resaltar TODAS las tareas atrasadas del usuario dentro de la misma sección
                 setTimeout(() => {
                   const today = new Date().toISOString().split('T')[0];
-                  const overdueTasks = tasks.filter(t => 
-                    t.assignedTo === currentUser?.id && 
-                    t.dueDate < today && 
-                    t.status !== 'completed'
+                  const overdueTasks = tasks.filter(
+                    (t) =>
+                      t.assignedTo === currentUser?.id &&
+                      t.dueDate < today &&
+                      t.status !== 'completed'
                   );
-                  
+
                   if (overdueTasks.length > 0) {
-                    const taskElement = document.querySelector(`[data-task-id="${overdueTasks[0].id}"]`);
+                    const taskElement = document.querySelector(
+                      `[data-task-id="${overdueTasks[0].id}"]`
+                    );
                     if (taskElement) {
                       taskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                    setHighlightedTaskIds(overdueTasks.map(t => t.id));
+                    setHighlightedTaskIds(overdueTasks.map((t) => t.id));
                     setTimeout(() => setHighlightedTaskIds([]), 3000);
                   }
                 }, 100);
               }}
-              onNavigateToTasks={(highlightType: 'overdue' | 'overdue-unassigned' | 'unassigned' | 'pending' | 'in-progress' | 'completed' = 'unassigned') => {
+              onNavigateToTasks={(
+                highlightType:
+                  | 'overdue'
+                  | 'overdue-unassigned'
+                  | 'unassigned'
+                  | 'pending'
+                  | 'in-progress'
+                  | 'completed' = 'unassigned'
+              ) => {
                 setActiveTab('tasks');
                 // Encontrar TODAS las tareas del tipo solicitado
                 const today = new Date().toISOString().split('T')[0];
                 let targetTasks: Task[] = [];
-                
+
                 if (highlightType === 'overdue') {
                   // Todas las tareas atrasadas (con o sin asignar)
-                  targetTasks = tasks.filter(t => 
-                    t.dueDate < today && 
-                    t.status !== 'completed'
-                  );
+                  targetTasks = tasks.filter((t) => t.dueDate < today && t.status !== 'completed');
                 } else if (highlightType === 'overdue-unassigned') {
                   // Solo tareas atrasadas sin asignar
-                  targetTasks = tasks.filter(t => 
-                    (!t.assignedTo || t.assignedTo === '') && 
-                    t.dueDate < today && 
-                    t.status !== 'completed'
+                  targetTasks = tasks.filter(
+                    (t) =>
+                      (!t.assignedTo || t.assignedTo === '') &&
+                      t.dueDate < today &&
+                      t.status !== 'completed'
                   );
                 } else if (highlightType === 'unassigned') {
                   // Tareas sin asignar (incluye atrasadas)
-                  targetTasks = tasks.filter(t => 
-                    (!t.assignedTo || t.assignedTo === '') && 
-                    t.status !== 'completed'
+                  targetTasks = tasks.filter(
+                    (t) => (!t.assignedTo || t.assignedTo === '') && t.status !== 'completed'
                   );
                 } else if (highlightType === 'pending') {
                   // Tareas con status pending
-                  targetTasks = tasks.filter(t => t.status === 'pending');
+                  targetTasks = tasks.filter((t) => t.status === 'pending');
                 } else if (highlightType === 'in-progress') {
                   // Tareas con status in-progress
-                  targetTasks = tasks.filter(t => t.status === 'in-progress');
+                  targetTasks = tasks.filter((t) => t.status === 'in-progress');
                 } else if (highlightType === 'completed') {
                   // Tareas completadas
-                  targetTasks = tasks.filter(t => t.status === 'completed');
+                  targetTasks = tasks.filter((t) => t.status === 'completed');
                 }
-                
+
                 if (targetTasks.length > 0) {
                   setTimeout(() => {
                     // Scroll a la primera tarea
-                    const firstTaskElement = document.querySelector(`[data-task-id="${targetTasks[0].id}"]`);
+                    const firstTaskElement = document.querySelector(
+                      `[data-task-id="${targetTasks[0].id}"]`
+                    );
                     if (firstTaskElement) {
                       firstTaskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
                     // Resaltar TODAS las tareas que cumplen el criterio
-                    setHighlightedTaskIds(targetTasks.map(t => t.id));
+                    setHighlightedTaskIds(targetTasks.map((t) => t.id));
                     // Limpiar el resaltado después de 3 segundos
                     setTimeout(() => setHighlightedTaskIds([]), 3000);
                   }, 100);
@@ -1688,11 +1937,11 @@ function App() {
               onAddCustomRoutine={addCustomRoutine}
               onUpdateCustomRoutine={updateCustomRoutine}
               onDeleteCustomRoutine={deleteCustomRoutine}
+              currentUserId={currentUserId}
+              onChangeUser={(userId) => setCurrentUserId(userId)}
             />
           )}
-          {activeTab === 'stats' && (
-            <LazyStatistics tasks={tasks} members={members} />
-          )}
+          {activeTab === 'stats' && <LazyStatistics tasks={tasks} members={members} />}
           {activeTab === 'members' && (
             <Members
               members={members}
@@ -1711,6 +1960,8 @@ function App() {
               onDeleteReward={deleteReward}
               onRedeemReward={redeemReward}
               onUpdateRedemptionStatus={updateRedemptionStatus}
+              currentUserId={currentUserId}
+              onChangeUser={(userId: string) => setCurrentUserId(userId)}
             />
           )}
           {activeTab === 'achievements' && (
@@ -1743,10 +1994,7 @@ function App() {
             />
           )}
           {activeTab === 'settings' && (
-            <Settings
-              homeConfig={homeConfig}
-              onUpdateConfig={setHomeConfig}
-            />
+            <Settings homeConfig={homeConfig} onUpdateConfig={setHomeConfig} />
           )}
         </div>
       </main>
